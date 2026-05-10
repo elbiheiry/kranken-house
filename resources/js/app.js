@@ -1,9 +1,7 @@
 import './bootstrap';
-/*
-  Add custom scripts here
-*/
-import.meta.glob([
-  '../assets/img/**',
-  // '../assets/json/**',
-  '../assets/vendor/fonts/**'
-]);
+import '../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar';
+import '../assets/vendor/js/helpers';
+import '../assets/vendor/js/menu';
+import '../assets/vendor/js/bootstrap';
+import '../assets/js/config';
+import '../assets/js/main';

@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -20,6 +23,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'role',
         'password',
     ];
 
@@ -42,7 +46,28 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'role' => UserRole::class,
             'password' => 'hashed',
         ];
+    }
+
+    public function residentProfile(): HasOne
+    {
+        return $this->hasOne(Resident::class);
+    }
+
+    public function supervisedCaseLogs(): HasMany
+    {
+        return $this->hasMany(CaseLog::class, 'supervisor_id');
+    }
+
+    public function approvals(): HasMany
+    {
+        return $this->hasMany(CaseApproval::class, 'supervisor_id');
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(SystemNotification::class);
     }
 }

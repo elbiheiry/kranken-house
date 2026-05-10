@@ -120,8 +120,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // If current layout is vertical and current window screen is > small
 
-  // Auto update menu collapsed/expanded based on the themeConfig
-      window.Helpers.setCollapsed(true, false);
+  // Keep menu expanded to match the original Sneat free template feel.
+  window.Helpers.setCollapsed(false, false);
 })();
 // Utils
 function isMacOS() {

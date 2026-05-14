@@ -81,41 +81,35 @@
         <div class="card-header">
           <h5 class="card-title m-0 me-2">{{ __('app.my_progress_by_procedure') }}</h5>
         </div>
-        <div class="table-responsive text-nowrap">
-          <table class="table">
-            <thead class="table-light">
-              <tr>
-                <th>{{ __('app.col_procedure') }}</th>
-                <th>{{ __('app.col_completed') }}</th>
-                <th>{{ __('app.col_expected') }}</th>
-                <th>{{ __('app.col_progress') }}</th>
-                <th>{{ __('app.col_status') }}</th>
-              </tr>
-            </thead>
-            <tbody class="table-border-bottom-0">
-              @forelse($progressRows as $row)
-                <tr>
-                  <td>{{ $row['procedure'] }}</td>
-                  <td>{{ $row['completed'] }}</td>
-                  <td>{{ $row['expected'] }}</td>
-                  <td>{{ $row['progress_percent'] }}%</td>
-                  <td>
-                    @if ($row['status'] === 'green')
-                      <span class="badge bg-label-success">{{ $row['status_label'] }}</span>
-                    @elseif($row['status'] === 'yellow')
-                      <span class="badge bg-label-warning">{{ $row['status_label'] }}</span>
-                    @else
-                      <span class="badge bg-label-danger">{{ $row['status_label'] }}</span>
-                    @endif
-                  </td>
-                </tr>
-              @empty
-                <tr>
-                  <td colspan="5" class="text-center text-muted">{{ __('app.no_progress_data') }}</td>
-                </tr>
-              @endforelse
-            </tbody>
-          </table>
+        <div class="card-body">
+          <div id="residentProgressChart" style="min-height: 320px;"></div>
+
+          <div class="row g-3 mt-1">
+            <div class="col-sm-4">
+              <div class="border rounded-3 p-3 h-100">
+                <span class="text-muted d-block mb-1">{{ __('app.col_completed') }}</span>
+                <h5 class="mb-0">{{ $totalCompletedCases }}</h5>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="border rounded-3 p-3 h-100">
+                <span class="text-muted d-block mb-1">{{ __('app.col_expected') }}</span>
+                <h5 class="mb-0">{{ $totalExpectedCases }}</h5>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="border rounded-3 p-3 h-100">
+                <span class="text-muted d-block mb-1">{{ __('app.col_progress') }}</span>
+                <h5 class="mb-0">{{ $overallProgressPercent }}%</h5>
+              </div>
+            </div>
+          </div>
+
+          @if (empty($progressChartLabels))
+            <p class="text-center text-muted mt-3 mb-0">{{ __('app.no_progress_data') }}</p>
+          @else
+            <p class="text-muted mt-3 mb-0">{{ __('app.procedures') }}: {{ $totalCompletedProcedures }}</p>
+          @endif
         </div>
       </div>
     </div>
@@ -124,33 +118,62 @@
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script>
     (function() {
-      var chartEl = document.querySelector('#residentMonthlyChart');
-      if (!chartEl || typeof ApexCharts === 'undefined') {
+      if (typeof ApexCharts === 'undefined') {
         return;
       }
 
-      var chart = new ApexCharts(chartEl, {
-        chart: {
-          type: 'bar',
-          height: 280,
-          toolbar: {
-            show: false
+      var chartEl = document.querySelector('#residentMonthlyChart');
+      if (chartEl) {
+        var chart = new ApexCharts(chartEl, {
+          chart: {
+            type: 'bar',
+            height: 280,
+            toolbar: {
+              show: false
+            }
+          },
+          series: [{
+            name: 'Cases',
+            data: @json($chartSeries)
+          }],
+          xaxis: {
+            categories: @json($chartLabels)
+          },
+          colors: ['#696cff'],
+          dataLabels: {
+            enabled: false
           }
-        },
-        series: [{
-          name: 'Cases',
-          data: @json($chartSeries)
-        }],
-        xaxis: {
-          categories: @json($chartLabels)
-        },
-        colors: ['#696cff'],
-        dataLabels: {
-          enabled: false
-        }
-      });
+        });
 
-      chart.render();
+        chart.render();
+      }
+
+      var progressEl = document.querySelector('#residentProgressChart');
+      if (progressEl) {
+        var progressChart = new ApexCharts(progressEl, {
+          chart: {
+            type: 'pie',
+            height: 320
+          },
+          labels: @json($progressChartLabels),
+          series: @json($progressChartSeries),
+          colors: @json($progressChartColors),
+          legend: {
+            position: 'bottom'
+          },
+          stroke: {
+            width: 0
+          },
+          noData: {
+            text: @json(__('app.no_progress_data'))
+          },
+          dataLabels: {
+            enabled: false
+          }
+        });
+
+        progressChart.render();
+      }
     })();
   </script>
 @endsection

@@ -208,16 +208,32 @@
 
       var statusEl = document.querySelector('#directorStatusChart');
       if (statusEl) {
+        var statusRouteMap = ['green', 'yellow', 'red'];
+        var residentsProgressUrl = @json(route('director.residents-progress'));
         var statusChart = new ApexCharts(statusEl, {
           chart: {
             type: 'donut',
-            height: 280
+            height: 280,
+            events: {
+              dataPointSelection: function(event, chartContext, config) {
+                var status = statusRouteMap[config.dataPointIndex];
+
+                if (!status) {
+                  return;
+                }
+
+                window.location.href = residentsProgressUrl + '?status=' + encodeURIComponent(status);
+              }
+            }
           },
           labels: @json(array_keys($statusCounts)),
           series: @json(array_values($statusCounts)),
           colors: ['#71dd37', '#ffab00', '#ff3e1d'],
           legend: {
-            position: 'bottom'
+            position: 'bottom',
+            onItemClick: {
+              toggleDataSeries: false
+            }
           }
         });
         statusChart.render();

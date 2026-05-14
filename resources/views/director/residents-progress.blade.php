@@ -22,9 +22,12 @@
           <label for="residentStatusFilter" class="form-label">{{ __('app.filter_status') }}</label>
           <select id="residentStatusFilter" class="form-select">
             <option value="">{{ __('app.all_statuses') }}</option>
-            <option value="green">{{ __('app.status_on_track') }}</option>
-            <option value="yellow">{{ __('app.status_at_risk') }}</option>
-            <option value="red">{{ __('app.status_behind') }}</option>
+            <option value="green" {{ $initialStatusFilter === 'green' ? 'selected' : '' }}>
+              {{ __('app.status_on_track') }}</option>
+            <option value="yellow" {{ $initialStatusFilter === 'yellow' ? 'selected' : '' }}>
+              {{ __('app.status_at_risk') }}</option>
+            <option value="red" {{ $initialStatusFilter === 'red' ? 'selected' : '' }}>{{ __('app.status_behind') }}
+            </option>
           </select>
         </div>
       </div>
@@ -146,6 +149,7 @@
 
         yearFilter.addEventListener('change', applyFilters);
         statusFilter.addEventListener('change', applyFilters);
+        applyFilters();
       }
 
       buttons.forEach(function(button) {

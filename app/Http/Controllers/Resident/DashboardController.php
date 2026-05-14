@@ -51,6 +51,14 @@ class DashboardController extends Controller
       ];
     }
 
+    $progressChartRows = collect($progressRows)
+      ->filter(fn(array $row) => $row['completed'] > 0 || $row['expected'] > 0)
+      ->values();
+
+    $totalCompleted = $progressChartRows->sum('completed');
+    $totalExpected = $progressChartRows->sum('expected');
+    $overallProgressPercent = (int) round(min(200, ProgressCalculator::completionRatio($totalCompleted, $totalExpected) * 100));
+
     $months = collect(range(5, 1))->map(fn(int $offset) => Carbon::now()->subMonths($offset)->format('Y-m'));
     $months = $months->push(Carbon::now()->format('Y-m'));
 
@@ -68,6 +76,15 @@ class DashboardController extends Controller
       'pendingCount' => $pendingCount,
       'rejectedCount' => $rejectedCount,
       'progressRows' => $progressRows,
+      'progressChartLabels' => $progressChartRows->pluck('procedure')->all(),
+      'progressChartSeries' => $progressChartRows->pluck('completed')->all(),
+      'progressChartColors' => $progressChartRows
+        ->map(fn(array $row, int $index) => ['#696cff', '#71dd37', '#03c3ec', '#ffab00', '#ff3e1d', '#8592a3'][$index % 6])
+        ->all(),
+      'totalCompletedProcedures' => $progressChartRows->count(),
+      'totalCompletedCases' => $totalCompleted,
+      'totalExpectedCases' => $totalExpected,
+      'overallProgressPercent' => $overallProgressPercent,
       'chartLabels' => $months->values(),
       'chartSeries' => $monthlySeries,
     ]);
@@ -98,6 +115,7 @@ class DashboardController extends Controller
     return $residents->map(function (Resident $resident) use ($procedures) {
       $completedTotal = 0;
       $expectedTotal = 0;
+      $procedureDetails = [];
 
       foreach ($procedures as $procedure) {
         if (! $procedure->trainingRequirement) {
@@ -106,9 +124,20 @@ class DashboardController extends Controller
 
         $completed = ProgressCalculator::completedCount($resident, $procedure);
         $expected = ProgressCalculator::expectedByTrainingYear($resident, $procedure->trainingRequirement);
+        $ratio = ProgressCalculator::completionRatio($completed, $expected);
+        $status = ProgressCalculator::status($ratio);
 
         $completedTotal += $completed;
         $expectedTotal += $expected;
+
+        $procedureDetails[] = [
+          'procedure_name' => $procedure->name,
+          'completed' => $completed,
+          'expected' => $expected,
+          'progress_percent' => (int) round(min(200, $ratio * 100)),
+          'status' => $status,
+          'status_label' => ProgressCalculator::statusLabel($status),
+        ];
       }
 
       $ratio = ProgressCalculator::completionRatio($completedTotal, $expectedTotal);
@@ -122,6 +151,7 @@ class DashboardController extends Controller
         'progress_percent' => (int) round(min(200, $ratio * 100)),
         'status' => $status,
         'status_label' => ProgressCalculator::statusLabel($status),
+        'procedure_details' => $procedureDetails,
       ];
     })->values();
   }

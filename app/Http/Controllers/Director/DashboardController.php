@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Director;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\CaseApproval;
 use App\Models\Procedure;
 use App\Models\Resident;
@@ -74,12 +75,18 @@ class DashboardController extends Controller
     ]);
   }
 
-  public function residentsProgress(): View
+  public function residentsProgress(Request $request): View
   {
     $residents = Resident::query()->with('user')->orderBy('training_year')->orderBy('id')->get();
+    $initialStatusFilter = $request->query('status');
+
+    if (! in_array($initialStatusFilter, ['green', 'yellow', 'red'], true)) {
+      $initialStatusFilter = '';
+    }
 
     return view('director.residents-progress', [
       'residentProgressRows' => $this->buildResidentProgressRows($residents),
+      'initialStatusFilter' => $initialStatusFilter,
     ]);
   }
 

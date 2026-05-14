@@ -33,12 +33,6 @@
             <li class="menu-header small text-uppercase">
               <span class="menu-header-text">{{ __('app.nav_header') }}</span>
             </li>
-            <li class="menu-item {{ request()->routeIs('home') ? 'active' : '' }}">
-              <a href="{{ route('home') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div>{{ __('app.home') }}</div>
-              </a>
-            </li>
 
             @if (auth()->user()->role->value === 'resident')
               <li class="menu-item {{ request()->routeIs('resident.dashboard') ? 'active' : '' }}">

@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Resident;
 use App\Http\Controllers\Controller;
 use App\Models\CaseLog;
 use App\Models\Procedure;
+use App\Models\Resident;
 use App\Support\ProgressCalculator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -69,5 +71,58 @@ class DashboardController extends Controller
       'chartLabels' => $months->values(),
       'chartSeries' => $monthlySeries,
     ]);
+  }
+
+  public function peersProgress(): View
+  {
+    $currentResident = Auth::user()->residentProfile;
+
+    abort_unless($currentResident, 403);
+
+    $residents = Resident::query()
+      ->with('user')
+      ->where('id', '!=', $currentResident->id)
+      ->orderBy('training_year')
+      ->orderBy('id')
+      ->get();
+
+    return view('resident.peers-progress', [
+      'peerRows' => $this->buildResidentProgressRows($residents),
+    ]);
+  }
+
+  private function buildResidentProgressRows(Collection $residents): Collection
+  {
+    $procedures = Procedure::with('trainingRequirement')->orderBy('name', 'asc')->get();
+
+    return $residents->map(function (Resident $resident) use ($procedures) {
+      $completedTotal = 0;
+      $expectedTotal = 0;
+
+      foreach ($procedures as $procedure) {
+        if (! $procedure->trainingRequirement) {
+          continue;
+        }
+
+        $completed = ProgressCalculator::completedCount($resident, $procedure);
+        $expected = ProgressCalculator::expectedByTrainingYear($resident, $procedure->trainingRequirement);
+
+        $completedTotal += $completed;
+        $expectedTotal += $expected;
+      }
+
+      $ratio = ProgressCalculator::completionRatio($completedTotal, $expectedTotal);
+      $status = ProgressCalculator::status($ratio);
+
+      return [
+        'resident_name' => $resident->user->name,
+        'training_year' => $resident->training_year,
+        'completed_total' => $completedTotal,
+        'expected_total' => $expectedTotal,
+        'progress_percent' => (int) round(min(200, $ratio * 100)),
+        'status' => $status,
+        'status_label' => ProgressCalculator::statusLabel($status),
+      ];
+    })->values();
   }
 }

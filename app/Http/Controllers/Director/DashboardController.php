@@ -8,6 +8,7 @@ use App\Models\Procedure;
 use App\Models\Resident;
 use App\Support\ProgressCalculator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -71,5 +72,62 @@ class DashboardController extends Controller
       'chartLabels' => $months->values(),
       'chartSeries' => $monthlySeries,
     ]);
+  }
+
+  public function residentsProgress(): View
+  {
+    $residents = Resident::query()->with('user')->orderBy('training_year')->orderBy('id')->get();
+
+    return view('director.residents-progress', [
+      'residentProgressRows' => $this->buildResidentProgressRows($residents),
+    ]);
+  }
+
+  private function buildResidentProgressRows(Collection $residents): Collection
+  {
+    $procedures = Procedure::with('trainingRequirement')->orderBy('name')->get();
+
+    return $residents->map(function (Resident $resident) use ($procedures) {
+      $completedTotal = 0;
+      $expectedTotal = 0;
+      $procedureDetails = [];
+
+      foreach ($procedures as $procedure) {
+        if (! $procedure->trainingRequirement) {
+          continue;
+        }
+
+        $completed = ProgressCalculator::completedCount($resident, $procedure);
+        $expected = ProgressCalculator::expectedByTrainingYear($resident, $procedure->trainingRequirement);
+        $ratio = ProgressCalculator::completionRatio($completed, $expected);
+        $status = ProgressCalculator::status($ratio);
+
+        $completedTotal += $completed;
+        $expectedTotal += $expected;
+
+        $procedureDetails[] = [
+          'procedure_name' => $procedure->name,
+          'completed' => $completed,
+          'expected' => $expected,
+          'progress_percent' => (int) round(min(200, $ratio * 100)),
+          'status' => $status,
+          'status_label' => ProgressCalculator::statusLabel($status),
+        ];
+      }
+
+      $ratio = ProgressCalculator::completionRatio($completedTotal, $expectedTotal);
+      $status = ProgressCalculator::status($ratio);
+
+      return [
+        'resident_name' => $resident->user->name,
+        'training_year' => $resident->training_year,
+        'completed_total' => $completedTotal,
+        'expected_total' => $expectedTotal,
+        'progress_percent' => (int) round(min(200, $ratio * 100)),
+        'status' => $status,
+        'status_label' => ProgressCalculator::statusLabel($status),
+        'procedure_details' => $procedureDetails,
+      ];
+    })->values();
   }
 }

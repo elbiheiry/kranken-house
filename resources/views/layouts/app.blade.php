@@ -59,6 +59,12 @@
                   <div>{{ __('app.log_new_case') }}</div>
                 </a>
               </li>
+              <li class="menu-item {{ request()->routeIs('resident.peers-progress') ? 'active' : '' }}">
+                <a href="{{ route('resident.peers-progress') }}" class="menu-link">
+                  <i class="menu-icon tf-icons bx bx-group"></i>
+                  <div>{{ __('app.peers_progress') }}</div>
+                </a>
+              </li>
             @elseif(auth()->user()->role->value === 'supervisor')
               <li class="menu-item {{ request()->routeIs('supervisor.dashboard') ? 'active' : '' }}">
                 <a href="{{ route('supervisor.dashboard') }}" class="menu-link">
@@ -77,6 +83,12 @@
                 <a href="{{ route('director.dashboard') }}" class="menu-link">
                   <i class="menu-icon tf-icons bx bx-line-chart"></i>
                   <div>{{ __('app.director_dashboard') }}</div>
+                </a>
+              </li>
+              <li class="menu-item {{ request()->routeIs('director.residents-progress') ? 'active' : '' }}">
+                <a href="{{ route('director.residents-progress') }}" class="menu-link">
+                  <i class="menu-icon tf-icons bx bx-user-pin"></i>
+                  <div>{{ __('app.residents_progress') }}</div>
                 </a>
               </li>
             @endif

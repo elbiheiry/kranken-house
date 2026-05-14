@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
 use App\Models\CaseApproval;
-use Illuminate\Support\Carbon;
+use App\Models\Procedure;
+use App\Models\Resident;
+use App\Support\ProgressCalculator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -20,17 +22,58 @@ class DashboardController extends Controller
     $approvedCount = (clone $baseQuery)->where('status', 'approved')->count();
     $rejectedCount = (clone $baseQuery)->where('status', 'rejected')->count();
 
-    $months = collect(range(5, 1))->map(fn(int $offset) => Carbon::now()->subMonths($offset)->format('Y-m'));
-    $months = $months->push(Carbon::now()->format('Y-m'));
+    $procedures = Procedure::with('trainingRequirement')->orderBy('name')->get();
+    $behindResidents = Resident::query()->with('user')->orderBy('training_year')->orderBy('id')->get()
+      ->map(function (Resident $resident) use ($procedures) {
+        $completedTotal = 0;
+        $expectedTotal = 0;
+        $procedureRows = collect();
 
-    $monthlyDecisions = (clone $baseQuery)
-      ->whereNotNull('decided_at')
-      ->whereDate('decided_at', '>=', Carbon::now()->startOfMonth()->subMonths(5))
-      ->orderBy('decided_at', 'asc')
-      ->get()
-      ->groupBy(fn(CaseApproval $approval) => $approval->decided_at?->format('Y-m'));
+        foreach ($procedures as $procedure) {
+          if (! $procedure->trainingRequirement) {
+            continue;
+          }
 
-    $monthlySeries = $months->map(fn(string $month) => $monthlyDecisions->get($month)?->count() ?? 0)->values();
+          $completed = ProgressCalculator::completedCount($resident, $procedure);
+          $expected = ProgressCalculator::expectedByTrainingYear($resident, $procedure->trainingRequirement);
+          $procedureRatio = ProgressCalculator::completionRatio($completed, $expected);
+          $procedureStatus = ProgressCalculator::status($procedureRatio);
+
+          $completedTotal += $completed;
+          $expectedTotal += $expected;
+          $procedureRows->push([
+            'name' => $procedure->name,
+            'ratio' => $procedureRatio,
+            'status' => $procedureStatus,
+          ]);
+        }
+
+        $ratio = ProgressCalculator::completionRatio($completedTotal, $expectedTotal);
+        $status = ProgressCalculator::status($ratio);
+
+        $behindProcedureRows = $procedureRows
+          ->where('status', 'red')
+          ->sortBy('ratio')
+          ->values();
+
+        $primaryBehindProcedure = $behindProcedureRows->first()['name'] ?? null;
+        $behindLabel = $primaryBehindProcedure
+          ? ($behindProcedureRows->count() > 1
+            ? $primaryBehindProcedure . ' (+' . ($behindProcedureRows->count() - 1) . ')'
+            : $primaryBehindProcedure)
+          : 'N/A';
+
+        return [
+          'name' => $resident->user->name,
+          'chart_label' => $resident->user->name . ' - ' . $behindLabel,
+          'behind_procedures' => $behindProcedureRows->pluck('name')->all(),
+          'progress_percent' => (int) round(min(200, $ratio * 100)),
+          'status' => $status,
+        ];
+      })
+      ->where('status', 'red')
+      ->sortBy('progress_percent')
+      ->values();
 
     $pendingApprovals = (clone $baseQuery)
       ->with(['caseLog.resident.user', 'caseLog.procedure'])
@@ -43,8 +86,12 @@ class DashboardController extends Controller
       'pendingCount' => $pendingCount,
       'approvedCount' => $approvedCount,
       'rejectedCount' => $rejectedCount,
-      'chartLabels' => $months->values(),
-      'chartSeries' => $monthlySeries,
+      'behindProcedureRows' => $behindResidents->map(fn(array $row) => [
+        'resident_name' => $row['name'],
+        'progress_percent' => $row['progress_percent'],
+        'procedures' => $row['behind_procedures'],
+      ])->values(),
+      'behindResidentsCount' => $behindResidents->count(),
       'pendingApprovals' => $pendingApprovals,
     ]);
   }

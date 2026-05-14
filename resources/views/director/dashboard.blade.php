@@ -93,29 +93,39 @@
     </div>
     <div class="card-body">
       <p class="text-muted">{{ __('app.status_color_hint') }}</p>
-      <form method="post" action="{{ route('director.recommendations.store') }}" class="mb-4">
-        @csrf
-        <div class="row g-3 align-items-end">
-          <div class="col-md-8">
-            <label class="form-label">{{ __('app.upcoming_procedure') }}</label>
-            <select class="form-select @error('procedure_id') is-invalid @enderror" name="procedure_id" required>
-              <option value="">{{ __('app.select_procedure') }}</option>
-              @foreach ($procedures as $procedure)
-                <option value="{{ $procedure->id }}">{{ $procedure->name }}</option>
-              @endforeach
-            </select>
-            @error('procedure_id')
-              <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-          </div>
-          <div class="col-md-4">
-            <button type="submit" class="btn btn-primary w-100">{{ __('app.generate_recommendation') }}</button>
-          </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <label for="directorYearFilter" class="form-label">{{ __('app.filter_training_year') }}</label>
+          <select id="directorYearFilter" class="form-select">
+            <option value="">{{ __('app.all_years') }}</option>
+            @foreach (collect($rows)->pluck('resident.training_year')->unique()->sort()->values() as $year)
+              <option value="{{ $year }}">R{{ $year }}</option>
+            @endforeach
+          </select>
         </div>
-      </form>
+        <div class="col-md-4">
+          <label for="directorProcedureFilter" class="form-label">{{ __('app.filter_procedure') }}</label>
+          <select id="directorProcedureFilter" class="form-select">
+            <option value="">{{ __('app.all_procedures') }}</option>
+            @foreach (collect($rows)->pluck('procedure.name')->unique()->sort()->values() as $procedureName)
+              <option value="{{ $procedureName }}">{{ $procedureName }}</option>
+            @endforeach
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="directorStatusFilter" class="form-label">{{ __('app.filter_status') }}</label>
+          <select id="directorStatusFilter" class="form-select">
+            <option value="">{{ __('app.all_statuses') }}</option>
+            <option value="green">{{ __('app.status_on_track') }}</option>
+            <option value="yellow">{{ __('app.status_at_risk') }}</option>
+            <option value="red">{{ __('app.status_behind') }}</option>
+          </select>
+        </div>
+      </div>
 
       <div class="table-responsive text-nowrap">
-        <table class="table">
+        <table class="table" id="directorProgressTable">
           <thead class="table-light">
             <tr>
               <th>{{ __('app.col_resident') }}</th>
@@ -129,7 +139,8 @@
           </thead>
           <tbody class="table-border-bottom-0">
             @forelse($rows as $row)
-              <tr>
+              <tr data-year="{{ $row['resident']->training_year }}" data-procedure="{{ $row['procedure']->name }}"
+                data-status="{{ $row['status'] }}">
                 <td>{{ $row['resident']->user->name }}</td>
                 <td>R{{ $row['resident']->training_year }}</td>
                 <td>{{ $row['procedure']->name }}</td>
@@ -154,6 +165,8 @@
           </tbody>
         </table>
       </div>
+
+      <p class="text-muted mt-3 mb-0 d-none" id="directorFilterNoResults">{{ __('app.no_filter_results') }}</p>
     </div>
   </div>
 
@@ -208,6 +221,41 @@
           }
         });
         statusChart.render();
+      }
+
+      var yearFilter = document.getElementById('directorYearFilter');
+      var procedureFilter = document.getElementById('directorProcedureFilter');
+      var statusFilter = document.getElementById('directorStatusFilter');
+      var table = document.getElementById('directorProgressTable');
+      var noResults = document.getElementById('directorFilterNoResults');
+
+      if (yearFilter && procedureFilter && statusFilter && table && noResults) {
+        var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr[data-year]'));
+
+        var applyFilters = function() {
+          var selectedYear = yearFilter.value;
+          var selectedProcedure = procedureFilter.value;
+          var selectedStatus = statusFilter.value;
+          var visibleCount = 0;
+
+          rows.forEach(function(row) {
+            var matchesYear = !selectedYear || row.getAttribute('data-year') === selectedYear;
+            var matchesProcedure = !selectedProcedure || row.getAttribute('data-procedure') === selectedProcedure;
+            var matchesStatus = !selectedStatus || row.getAttribute('data-status') === selectedStatus;
+            var visible = matchesYear && matchesProcedure && matchesStatus;
+
+            row.classList.toggle('d-none', !visible);
+            if (visible) {
+              visibleCount += 1;
+            }
+          });
+
+          noResults.classList.toggle('d-none', visibleCount > 0 || rows.length === 0);
+        };
+
+        yearFilter.addEventListener('change', applyFilters);
+        procedureFilter.addEventListener('change', applyFilters);
+        statusFilter.addEventListener('change', applyFilters);
       }
     })();
   </script>

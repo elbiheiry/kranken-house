@@ -9,6 +9,7 @@
       <table class="table">
         <thead class="table-light">
           <tr>
+            <th>{{ __('app.col_case_code') }}</th>
             <th>{{ __('app.col_resident') }}</th>
             <th>{{ __('app.col_procedure') }}</th>
             <th>{{ __('app.col_date') }}</th>
@@ -19,6 +20,7 @@
         <tbody class="table-border-bottom-0">
           @forelse($approvals as $approval)
             <tr>
+              <td>{{ $approval->caseLog->case_code }}</td>
               <td>{{ $approval->caseLog->resident->user->name }}</td>
               <td>{{ $approval->caseLog->procedure->name }}</td>
               <td>{{ $approval->caseLog->operation_date?->format('Y-m-d') }}</td>
@@ -45,7 +47,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="5" class="text-center text-muted">{{ __('app.no_pending_approvals') }}</td>
+              <td colspan="6" class="text-center text-muted">{{ __('app.no_pending_approvals') }}</td>
             </tr>
           @endforelse
         </tbody>

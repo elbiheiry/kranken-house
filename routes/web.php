@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
 
   Route::prefix('resident')->name('resident.')->middleware('role:resident')->group(function () {
     Route::get('/dashboard', [ResidentDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/peers-progress', [ResidentDashboardController::class, 'peersProgress'])->name('peers-progress');
     Route::get('/case-logs', [CaseLogController::class, 'index'])->name('case-logs.index');
     Route::get('/case-logs/create', [CaseLogController::class, 'create'])->name('case-logs.create');
     Route::post('/case-logs', [CaseLogController::class, 'store'])->name('case-logs.store');
@@ -59,6 +60,7 @@ Route::middleware('auth')->group(function () {
 
   Route::prefix('director')->name('director.')->middleware('role:director')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/residents-progress', [DashboardController::class, 'residentsProgress'])->name('residents-progress');
     Route::post('/recommendations', [RecommendationController::class, 'store'])->name('recommendations.store');
   });
 });

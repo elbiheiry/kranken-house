@@ -10,6 +10,7 @@ use App\Models\Resident;
 use App\Models\SystemNotification;
 use App\Models\TrainingRequirement;
 use App\Models\User;
+use App\Support\ProgressCalculator;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -80,7 +81,7 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            return $procedure;
+            return $procedure->load('trainingRequirement');
         });
 
         DB::table('case_approvals')->delete();
@@ -90,6 +91,15 @@ class DatabaseSeeder extends Seeder
 
         $supervisorIds = [$supervisorOne->id, $supervisorTwo->id];
         $roles = ['assistant', 'first_assistant', 'primary', 'supervised_primary'];
+        $qualifyingRoles = ['first_assistant', 'primary', 'supervised_primary'];
+        $targetRatioByTrainingYear = [
+            1 => 0.78, // at risk
+            2 => 1.02, // on track
+            3 => 1.00, // on track
+            4 => 0.82, // at risk
+            5 => 0.66, // behind
+            6 => 0.70,
+        ];
         $feedbackPool = [
             'Good dissection plane and safe tissue handling.',
             'Improve anatomical landmark recognition before clipping.',
@@ -100,9 +110,27 @@ class DatabaseSeeder extends Seeder
 
         foreach ($residents as $residentIndex => $resident) {
             foreach ($procedureModels as $procedureIndex => $procedure) {
-                for ($i = 0; $i < 6; $i++) {
+                $residentRatio = $targetRatioByTrainingYear[$resident->training_year] ?? 0.80;
+                $expectedForProcedure = ProgressCalculator::expectedByTrainingYear($resident, $procedure->trainingRequirement);
+                $qualifiedApprovedTarget = max(1, (int) round($expectedForProcedure * $residentRatio));
+
+                $caseBlueprints = [];
+
+                for ($i = 0; $i < $qualifiedApprovedTarget; $i++) {
+                    $caseBlueprints[] = [
+                        'status' => 'approved',
+                        'role' => $qualifyingRoles[$i % count($qualifyingRoles)],
+                    ];
+                }
+
+                // Add non-qualifying or undecided entries to keep data realistic.
+                $caseBlueprints[] = ['status' => 'approved', 'role' => 'assistant'];
+                $caseBlueprints[] = ['status' => 'rejected', 'role' => $roles[($residentIndex + $procedureIndex) % count($roles)]];
+                $caseBlueprints[] = ['status' => 'pending', 'role' => $roles[($residentIndex + $procedureIndex + 1) % count($roles)]];
+
+                foreach ($caseBlueprints as $i => $blueprint) {
                     $operationDate = now()->subDays(($residentIndex * 20) + ($procedureIndex * 8) + ($i * 5));
-                    $role = $roles[($residentIndex + $procedureIndex + $i) % count($roles)];
+                    $role = $blueprint['role'];
                     $supervisorId = $supervisorIds[($procedureIndex + $i) % count($supervisorIds)];
 
                     $log = CaseLog::create([
@@ -117,11 +145,7 @@ class DatabaseSeeder extends Seeder
                         'note' => 'Seeded operation case for MVP demo data.',
                     ]);
 
-                    $status = match (true) {
-                        $i === 0 => 'pending',
-                        $i % 5 === 0 => 'rejected',
-                        default => 'approved',
-                    };
+                    $status = $blueprint['status'];
 
                     CaseApproval::create([
                         'case_log_id' => $log->id,

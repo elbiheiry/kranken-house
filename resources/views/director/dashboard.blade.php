@@ -170,6 +170,46 @@
     </div>
   </div>
 
+  <div class="card mt-4">
+    <div class="card-header">
+      <h5 class="card-title m-0 me-2">{{ __('app.generate_recommendation') }}</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">{{ __('app.recommendations_hint') }}</p>
+
+      <div class="table-responsive text-nowrap">
+        <table class="table" id="directorRecommendationsTable">
+          <thead class="table-light">
+            <tr>
+              <th>{{ __('app.col_resident') }}</th>
+              <th>{{ __('app.col_year') }}</th>
+              <th>{{ __('app.col_procedure') }}</th>
+              <th>{{ __('app.col_progress') }}</th>
+              <th>{{ __('app.col_recommendation') }}</th>
+              <th>{{ __('app.col_reason') }}</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            @forelse($rows as $row)
+              <tr>
+                <td>{{ $row['resident']->user->name }}</td>
+                <td>R{{ $row['resident']->training_year }}</td>
+                <td>{{ $row['procedure']->name }}</td>
+                <td>{{ $row['progress_percent'] }}%</td>
+                <td>{{ $row['recommendation'] }}</td>
+                <td>{{ $row['recommendation_reason'] }}</td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="6" class="text-center text-muted">{{ __('app.no_progress_rows') }}</td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script>
     (function() {

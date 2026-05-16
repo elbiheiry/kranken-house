@@ -45,6 +45,7 @@ return [
   'approved_trend_chart'       => 'Approved Cases Trend (6 Months)',
   'status_mix_chart'           => 'Resident Progress Status Mix',
   'director_section_title'     => 'Training Director Dashboard',
+  'recommendations_hint'       => 'Recommendations are generated from each resident\'s year-based progress for each procedure.',
   'peers_progress_title'       => 'Residents Progress Overview',
   'peers_progress_hint'        => 'Track aggregate progress for other residents across all required procedures.',
   'residents_progress_title'   => 'All Residents Progress',
@@ -52,6 +53,8 @@ return [
   'view_total_progress'        => 'View Total Progress',
   'total_progress'             => 'Total Progress',
   'procedure_details'          => 'Procedure Details',
+  'max_required_by_year'       => 'Maximum Required (By Year)',
+  'performed_by_resident'      => 'Performed By Resident',
   'behind_residents_hint'      => ':count resident(s) are currently behind.',
   'behind_procedures_list'     => 'Behind procedures by resident',
   'filter_training_year'       => 'Filter by training year',
@@ -77,6 +80,8 @@ return [
   'col_resident'        => 'Resident',
   'col_action'          => 'Action',
   'col_year'            => 'Year',
+  'col_recommendation'  => 'Recommendation',
+  'col_reason'          => 'Reason',
 
   // Empty states
   'no_progress_data'    => 'No progress data.',
@@ -119,6 +124,16 @@ return [
   'status_color_hint'      => 'Color logic: green = on track, yellow = at risk, red = behind.',
   'upcoming_procedure'     => 'Upcoming Procedure',
   'generate_recommendation' => 'Generate Recommendation',
+  'rec_observe_exposure'   => 'Observe Case Exposure',
+  'rec_urgent_remediation' => 'Urgent Remediation Plan',
+  'rec_targeted_practice'  => 'Targeted Practice Sessions',
+  'rec_increase_complexity' => 'Increase Case Complexity',
+  'rec_maintain_pace'      => 'Maintain Current Pace',
+  'rec_reason_no_current_year_requirement' => 'No minimum requirement is defined for this procedure in the current training year yet.',
+  'rec_reason_red'         => 'Completed :completed out of :expected; shortfall is :shortfall. Increase supervised exposure immediately.',
+  'rec_reason_yellow'      => 'Completed :completed out of :expected; shortfall is :shortfall. Add focused opportunities to close the gap.',
+  'rec_reason_exceeding'   => 'Completed :completed versus expected :expected. Resident is ahead, so consider higher-complexity cases.',
+  'rec_reason_on_track'    => 'Completed :completed out of :expected. Progress is on track; keep consistent exposure.',
 
   // Flash messages
   'flash_case_submitted'   => 'Case log submitted for approval.',

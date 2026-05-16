@@ -75,11 +75,21 @@ class DashboardController extends Controller
       'approvedCount' => $approvedCount,
       'pendingCount' => $pendingCount,
       'rejectedCount' => $rejectedCount,
+      'residentTrainingYear' => $resident->training_year,
       'progressRows' => $progressRows,
       'progressChartLabels' => $progressChartRows->pluck('procedure')->all(),
       'progressChartSeries' => $progressChartRows->pluck('completed')->all(),
       'progressChartColors' => $progressChartRows
         ->map(fn(array $row, int $index) => ['#696cff', '#71dd37', '#03c3ec', '#ffab00', '#ff3e1d', '#8592a3'][$index % 6])
+        ->all(),
+      'progressChartDetails' => $progressChartRows
+        ->map(fn(array $row) => [
+          'procedure' => $row['procedure'],
+          'completed' => $row['completed'],
+          'expected' => $row['expected'],
+          'progress_percent' => $row['progress_percent'],
+        ])
+        ->values()
         ->all(),
       'totalCompletedProcedures' => $progressChartRows->count(),
       'totalCompletedCases' => $totalCompleted,

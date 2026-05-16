@@ -109,6 +109,26 @@
             <p class="text-center text-muted mt-3 mb-0">{{ __('app.no_progress_data') }}</p>
           @else
             <p class="text-muted mt-3 mb-0">{{ __('app.procedures') }}: {{ $totalCompletedProcedures }}</p>
+            <div class="border rounded-3 p-3 mt-3" id="procedureProgressDetails">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0" id="procedureDetailName">-</h6>
+                <span class="badge bg-label-primary">{{ __('app.col_year') }} {{ $residentTrainingYear }}</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-sm-4">
+                  <div class="small text-muted">{{ __('app.max_required_by_year') }}</div>
+                  <div class="fw-semibold" id="procedureDetailExpected">0</div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="small text-muted">{{ __('app.performed_by_resident') }}</div>
+                  <div class="fw-semibold" id="procedureDetailCompleted">0</div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="small text-muted">{{ __('app.col_progress') }}</div>
+                  <div class="fw-semibold" id="procedureDetailPercent">0%</div>
+                </div>
+              </div>
+            </div>
           @endif
         </div>
       </div>
@@ -150,10 +170,51 @@
 
       var progressEl = document.querySelector('#residentProgressChart');
       if (progressEl) {
+        var progressDetails = @json($progressChartDetails);
+        var detailNameEl = document.querySelector('#procedureDetailName');
+        var detailExpectedEl = document.querySelector('#procedureDetailExpected');
+        var detailCompletedEl = document.querySelector('#procedureDetailCompleted');
+        var detailPercentEl = document.querySelector('#procedureDetailPercent');
+
+        var renderProcedureDetails = function(dataPointIndex) {
+          if (!Array.isArray(progressDetails) || progressDetails.length === 0) {
+            return;
+          }
+
+          var row = progressDetails[dataPointIndex] || progressDetails[0];
+          if (!row) {
+            return;
+          }
+
+          if (detailNameEl) {
+            detailNameEl.textContent = row.procedure || '-';
+          }
+
+          if (detailExpectedEl) {
+            detailExpectedEl.textContent = String(row.expected ?? 0);
+          }
+
+          if (detailCompletedEl) {
+            detailCompletedEl.textContent = String(row.completed ?? 0);
+          }
+
+          if (detailPercentEl) {
+            detailPercentEl.textContent = String(row.progress_percent ?? 0) + '%';
+          }
+        };
+
         var progressChart = new ApexCharts(progressEl, {
           chart: {
             type: 'pie',
-            height: 320
+            height: 320,
+            events: {
+              dataPointSelection: function(event, chartContext, config) {
+                renderProcedureDetails(config.dataPointIndex);
+              },
+              legendClick: function(chartContext, seriesIndex) {
+                renderProcedureDetails(seriesIndex);
+              }
+            }
           },
           labels: @json($progressChartLabels),
           series: @json($progressChartSeries),
@@ -173,6 +234,7 @@
         });
 
         progressChart.render();
+        renderProcedureDetails(0);
       }
     })();
   </script>

@@ -45,6 +45,7 @@ return [
   'approved_trend_chart'       => 'Trend genehmigter Fälle (6 Monate)',
   'status_mix_chart'           => 'Fortschrittsstatus der Assistenzärzte',
   'director_section_title'     => 'Direktorenpanel',
+  'recommendations_hint'       => 'Empfehlungen basieren auf dem jahresbezogenen Fortschritt jedes Assistenzarztes pro Eingriff.',
   'peers_progress_title'       => 'Fortschrittsubersicht der Assistenzarzte',
   'peers_progress_hint'        => 'Zeigt den Gesamtfortschritt anderer Assistenzarzte uber alle Pflicht-Eingriffe.',
   'residents_progress_title'   => 'Fortschritt aller Assistenzarzte',
@@ -52,6 +53,8 @@ return [
   'view_total_progress'        => 'Gesamtfortschritt anzeigen',
   'total_progress'             => 'Gesamtfortschritt',
   'procedure_details'          => 'Eingriffsdetails',
+  'max_required_by_year'       => 'Maximal erforderlich (nach Jahr)',
+  'performed_by_resident'      => 'Vom Assistenzarzt durchgefuhrt',
   'behind_residents_hint'      => ':count Assistenzarzt(e) liegen derzeit zuruck.',
   'behind_procedures_list'     => 'Zuruckliegende Eingriffe pro Assistenzarzt',
   'filter_training_year'       => 'Nach Ausbildungsjahr filtern',
@@ -77,6 +80,8 @@ return [
   'col_resident'        => 'Assistenzarzt',
   'col_action'          => 'Aktion',
   'col_year'            => 'Jahr',
+  'col_recommendation'  => 'Empfehlung',
+  'col_reason'          => 'Begrundung',
 
   // Empty states
   'no_progress_data'    => 'Keine Fortschrittsdaten vorhanden.',
@@ -119,6 +124,16 @@ return [
   'status_color_hint'      => 'Farblogik: grün = auf Kurs, gelb = gefährdet, rot = zurück.',
   'upcoming_procedure'     => 'Bevorstehender Eingriff',
   'generate_recommendation' => 'Empfehlung generieren',
+  'rec_observe_exposure'   => 'Fall-Exposition beobachten',
+  'rec_urgent_remediation' => 'Dringender Aufholplan',
+  'rec_targeted_practice'  => 'Gezielte Trainingsfalle',
+  'rec_increase_complexity' => 'Komplexitat steigern',
+  'rec_maintain_pace'      => 'Aktuelles Tempo halten',
+  'rec_reason_no_current_year_requirement' => 'Fur diesen Eingriff ist im aktuellen Ausbildungsjahr noch keine Mindestanforderung definiert.',
+  'rec_reason_red'         => ':completed von :expected abgeschlossen; Defizit: :shortfall. Die supervidierte Exposition sollte sofort erhoht werden.',
+  'rec_reason_yellow'      => ':completed von :expected abgeschlossen; Defizit: :shortfall. Gezielte Moglichkeiten sollten geplant werden, um die Lucke zu schliessen.',
+  'rec_reason_exceeding'   => ':completed im Vergleich zu erwartet :expected abgeschlossen. Der Assistenzarzt liegt vorne, daher komplexere Falle erwagen.',
+  'rec_reason_on_track'    => ':completed von :expected abgeschlossen. Fortschritt ist auf Kurs; kontinuierliche Exposition beibehalten.',
 
   // Flash messages
   'flash_case_submitted'   => 'Fallprotokoll zur Genehmigung eingereicht.',

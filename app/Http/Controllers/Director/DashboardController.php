@@ -31,6 +31,7 @@ class DashboardController extends Controller
         $expected = ProgressCalculator::expectedByTrainingYear($resident, $procedure->trainingRequirement);
         $ratio = ProgressCalculator::completionRatio($completed, $expected);
         $status = ProgressCalculator::status($ratio);
+        $recommendation = $this->buildRecommendation($completed, $expected, $ratio, $status);
 
         $rows[] = [
           'resident' => $resident,
@@ -40,6 +41,8 @@ class DashboardController extends Controller
           'progress_percent' => (int) round(min(200, $ratio * 100)),
           'status' => $status,
           'status_label' => ProgressCalculator::statusLabel($status),
+          'recommendation' => $recommendation['title'],
+          'recommendation_reason' => $recommendation['reason'],
         ];
       }
     }
@@ -73,6 +76,58 @@ class DashboardController extends Controller
       'chartLabels' => $months->values(),
       'chartSeries' => $monthlySeries,
     ]);
+  }
+
+  private function buildRecommendation(int $completed, int $expected, float $ratio, string $status): array
+  {
+    if ($expected <= 0) {
+      return [
+        'title' => __('app.rec_observe_exposure'),
+        'reason' => __('app.rec_reason_no_current_year_requirement'),
+      ];
+    }
+
+    $shortfall = max(0, $expected - $completed);
+
+    if ($status === 'red') {
+      return [
+        'title' => __('app.rec_urgent_remediation'),
+        'reason' => __('app.rec_reason_red', [
+          'completed' => $completed,
+          'expected' => $expected,
+          'shortfall' => $shortfall,
+        ]),
+      ];
+    }
+
+    if ($status === 'yellow') {
+      return [
+        'title' => __('app.rec_targeted_practice'),
+        'reason' => __('app.rec_reason_yellow', [
+          'completed' => $completed,
+          'expected' => $expected,
+          'shortfall' => $shortfall,
+        ]),
+      ];
+    }
+
+    if ($ratio >= 1.2) {
+      return [
+        'title' => __('app.rec_increase_complexity'),
+        'reason' => __('app.rec_reason_exceeding', [
+          'completed' => $completed,
+          'expected' => $expected,
+        ]),
+      ];
+    }
+
+    return [
+      'title' => __('app.rec_maintain_pace'),
+      'reason' => __('app.rec_reason_on_track', [
+        'completed' => $completed,
+        'expected' => $expected,
+      ]),
+    ];
   }
 
   public function residentsProgress(Request $request): View

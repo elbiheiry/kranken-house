@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-  <div class="authentication-wrapper authentication-basic container-p-y">
-    <div class="authentication-inner">
-      <div class="card px-sm-6 px-0">
+  <div class="authentication-wrapper authentication-basic container-p-y stms-login-page"
+    style="background-image: linear-gradient(rgba(12, 32, 56, 0.36), rgba(12, 32, 56, 0.36)), url('{{ asset('assets/img/backgrounds/stms-identity.svg?v=3') }}'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 100vh; padding: 1.5rem;">
+    <div class="authentication-inner" style="margin-top: clamp(170px, 22vh, 280px);">
+      <div class="card px-sm-6 px-0" style="background-color: rgba(255, 255, 255, 0.95);">
         <div class="card-body">
           <div class="d-flex justify-content-end mb-2 gap-1">
             <a href="{{ route('locale.switch', 'en') }}"

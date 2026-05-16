@@ -115,15 +115,19 @@
                 <span class="badge bg-label-primary">{{ __('app.col_year') }} {{ $residentTrainingYear }}</span>
               </div>
               <div class="row g-3">
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                   <div class="small text-muted">{{ __('app.max_required_by_year') }}</div>
                   <div class="fw-semibold" id="procedureDetailExpected">0</div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
+                  <div class="small text-muted">{{ __('app.total_required_all_years') }}</div>
+                  <div class="fw-semibold" id="procedureDetailAllYearsRequired">0</div>
+                </div>
+                <div class="col-sm-3">
                   <div class="small text-muted">{{ __('app.performed_by_resident') }}</div>
                   <div class="fw-semibold" id="procedureDetailCompleted">0</div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                   <div class="small text-muted">{{ __('app.col_progress') }}</div>
                   <div class="fw-semibold" id="procedureDetailPercent">0%</div>
                 </div>
@@ -173,6 +177,7 @@
         var progressDetails = @json($progressChartDetails);
         var detailNameEl = document.querySelector('#procedureDetailName');
         var detailExpectedEl = document.querySelector('#procedureDetailExpected');
+        var detailAllYearsRequiredEl = document.querySelector('#procedureDetailAllYearsRequired');
         var detailCompletedEl = document.querySelector('#procedureDetailCompleted');
         var detailPercentEl = document.querySelector('#procedureDetailPercent');
 
@@ -192,6 +197,10 @@
 
           if (detailExpectedEl) {
             detailExpectedEl.textContent = String(row.expected ?? 0);
+          }
+
+          if (detailAllYearsRequiredEl) {
+            detailAllYearsRequiredEl.textContent = String(row.required_all_years ?? 0);
           }
 
           if (detailCompletedEl) {

@@ -45,6 +45,7 @@ class DashboardController extends Controller
         'procedure' => $procedure->name,
         'completed' => $completed,
         'expected' => $expected,
+        'required_all_years' => $procedure->trainingRequirement->required_by_end_of_program,
         'progress_percent' => (int) round(min(200, $ratio * 100)),
         'status' => $status,
         'status_label' => ProgressCalculator::statusLabel($status),
@@ -87,6 +88,7 @@ class DashboardController extends Controller
           'procedure' => $row['procedure'],
           'completed' => $row['completed'],
           'expected' => $row['expected'],
+          'required_all_years' => $row['required_all_years'],
           'progress_percent' => $row['progress_percent'],
         ])
         ->values()

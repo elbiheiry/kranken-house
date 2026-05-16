@@ -54,6 +54,7 @@ return [
   'total_progress'             => 'Gesamtfortschritt',
   'procedure_details'          => 'Eingriffsdetails',
   'max_required_by_year'       => 'Maximal erforderlich (nach Jahr)',
+  'total_required_all_years'   => 'Insgesamt erforderlich (alle Jahre)',
   'performed_by_resident'      => 'Vom Assistenzarzt durchgefuhrt',
   'behind_residents_hint'      => ':count Assistenzarzt(e) liegen derzeit zuruck.',
   'behind_procedures_list'     => 'Zuruckliegende Eingriffe pro Assistenzarzt',
@@ -82,6 +83,8 @@ return [
   'col_year'            => 'Jahr',
   'col_recommendation'  => 'Empfehlung',
   'col_reason'          => 'Begrundung',
+  'col_progress_by_resident_year' => 'Fortschritt je Assistenzarzt (Jahr)',
+  'col_recommended_residents' => 'Empfohlene Assistenzarzte',
 
   // Empty states
   'no_progress_data'    => 'Keine Fortschrittsdaten vorhanden.',
@@ -134,6 +137,9 @@ return [
   'rec_reason_yellow'      => ':completed von :expected abgeschlossen; Defizit: :shortfall. Gezielte Moglichkeiten sollten geplant werden, um die Lucke zu schliessen.',
   'rec_reason_exceeding'   => ':completed im Vergleich zu erwartet :expected abgeschlossen. Der Assistenzarzt liegt vorne, daher komplexere Falle erwagen.',
   'rec_reason_on_track'    => ':completed von :expected abgeschlossen. Fortschritt ist auf Kurs; kontinuierliche Exposition beibehalten.',
+  'rec_reason_all_on_track' => 'Alle Assistenzarzte sind bei diesem Eingriff derzeit auf Kurs.',
+  'rec_reason_row_shortfall' => ':resident (R:year) liegt bei :progress% (:completed/:expected), Defizit :shortfall; fur gezielte Unterstutzung priorisiert.',
+  'no_resident_recommendations' => 'Derzeit sind keine Empfehlungen fur Assistenzarzte erforderlich.',
 
   // Flash messages
   'flash_case_submitted'   => 'Fallprotokoll zur Genehmigung eingereicht.',

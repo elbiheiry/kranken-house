@@ -87,6 +87,77 @@
     </div>
   </div>
 
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="card-title m-0 me-2">{{ __('app.generate_recommendation') }}</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">{{ __('app.recommendations_hint') }}</p>
+
+      <div class="table-responsive">
+        <table class="table" id="directorRecommendationsTable">
+          <thead class="table-light">
+            <tr>
+              <th>{{ __('app.col_procedure') }}</th>
+              <th>{{ __('app.col_progress_by_resident_year') }}</th>
+              <th>{{ __('app.col_recommended_residents') }}</th>
+              <th>{{ __('app.col_reason') }}</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            @forelse($recommendationRows as $row)
+              <tr>
+                <td class="fw-semibold">{{ $row['procedure_name'] }}</td>
+                <td>
+                  @foreach ($row['resident_progress'] as $residentProgress)
+                    <div class="mb-1">
+                      {{ $residentProgress['resident_name'] }} (R{{ $residentProgress['training_year'] }})
+                      <span class="text-muted">- {{ $residentProgress['progress_percent'] }}%
+                        ({{ $residentProgress['completed'] }}/{{ $residentProgress['expected'] }})</span>
+                    </div>
+                  @endforeach
+                </td>
+                <td>
+                  @if (empty($row['recommended_residents']))
+                    <span class="text-muted">{{ __('app.no_resident_recommendations') }}</span>
+                  @else
+                    @foreach ($row['recommended_residents'] as $recommendedResident)
+                      <div class="mb-1">
+                        {{ $recommendedResident['resident_name'] }} (R{{ $recommendedResident['training_year'] }})
+                      </div>
+                    @endforeach
+                  @endif
+                </td>
+                <td>
+                  @if (empty($row['recommended_residents']))
+                    <span class="text-muted">{{ __('app.rec_reason_all_on_track') }}</span>
+                  @else
+                    @foreach ($row['recommended_residents'] as $recommendedResident)
+                      <div class="mb-1">
+                        {{ __('app.rec_reason_row_shortfall', [
+                            'resident' => $recommendedResident['resident_name'],
+                            'year' => $recommendedResident['training_year'],
+                            'progress' => $recommendedResident['progress_percent'],
+                            'completed' => $recommendedResident['completed'],
+                            'expected' => $recommendedResident['expected'],
+                            'shortfall' => $recommendedResident['shortfall'],
+                        ]) }}
+                      </div>
+                    @endforeach
+                  @endif
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="4" class="text-center text-muted">{{ __('app.no_progress_rows') }}</td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-header">
       <h5 class="card-title m-0 me-2">{{ __('app.director_section_title') }}</h5>
@@ -167,46 +238,6 @@
       </div>
 
       <p class="text-muted mt-3 mb-0 d-none" id="directorFilterNoResults">{{ __('app.no_filter_results') }}</p>
-    </div>
-  </div>
-
-  <div class="card mt-4">
-    <div class="card-header">
-      <h5 class="card-title m-0 me-2">{{ __('app.generate_recommendation') }}</h5>
-    </div>
-    <div class="card-body">
-      <p class="text-muted">{{ __('app.recommendations_hint') }}</p>
-
-      <div class="table-responsive text-nowrap">
-        <table class="table" id="directorRecommendationsTable">
-          <thead class="table-light">
-            <tr>
-              <th>{{ __('app.col_resident') }}</th>
-              <th>{{ __('app.col_year') }}</th>
-              <th>{{ __('app.col_procedure') }}</th>
-              <th>{{ __('app.col_progress') }}</th>
-              <th>{{ __('app.col_recommendation') }}</th>
-              <th>{{ __('app.col_reason') }}</th>
-            </tr>
-          </thead>
-          <tbody class="table-border-bottom-0">
-            @forelse($rows as $row)
-              <tr>
-                <td>{{ $row['resident']->user->name }}</td>
-                <td>R{{ $row['resident']->training_year }}</td>
-                <td>{{ $row['procedure']->name }}</td>
-                <td>{{ $row['progress_percent'] }}%</td>
-                <td>{{ $row['recommendation'] }}</td>
-                <td>{{ $row['recommendation_reason'] }}</td>
-              </tr>
-            @empty
-              <tr>
-                <td colspan="6" class="text-center text-muted">{{ __('app.no_progress_rows') }}</td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
-      </div>
     </div>
   </div>
 

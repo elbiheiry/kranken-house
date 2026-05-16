@@ -54,6 +54,7 @@ return [
   'total_progress'             => 'Total Progress',
   'procedure_details'          => 'Procedure Details',
   'max_required_by_year'       => 'Maximum Required (By Year)',
+  'total_required_all_years'   => 'Total Required (All Years)',
   'performed_by_resident'      => 'Performed By Resident',
   'behind_residents_hint'      => ':count resident(s) are currently behind.',
   'behind_procedures_list'     => 'Behind procedures by resident',
@@ -82,6 +83,8 @@ return [
   'col_year'            => 'Year',
   'col_recommendation'  => 'Recommendation',
   'col_reason'          => 'Reason',
+  'col_progress_by_resident_year' => 'Progress By Resident (Year)',
+  'col_recommended_residents' => 'Recommended Residents',
 
   // Empty states
   'no_progress_data'    => 'No progress data.',
@@ -134,6 +137,9 @@ return [
   'rec_reason_yellow'      => 'Completed :completed out of :expected; shortfall is :shortfall. Add focused opportunities to close the gap.',
   'rec_reason_exceeding'   => 'Completed :completed versus expected :expected. Resident is ahead, so consider higher-complexity cases.',
   'rec_reason_on_track'    => 'Completed :completed out of :expected. Progress is on track; keep consistent exposure.',
+  'rec_reason_all_on_track' => 'All residents are currently on track for this procedure.',
+  'rec_reason_row_shortfall' => ':resident (R:year) is at :progress% (:completed/:expected), shortfall :shortfall; prioritized for targeted support.',
+  'no_resident_recommendations' => 'No residents currently need recommendation.',
 
   // Flash messages
   'flash_case_submitted'   => 'Case log submitted for approval.',

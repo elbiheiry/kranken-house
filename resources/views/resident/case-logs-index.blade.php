@@ -24,9 +24,9 @@
               <td>{{ $log->operation_date?->format('Y-m-d') }}</td>
               <td>{{ $log->case_code }}</td>
               <td>{{ $log->procedure->name }}</td>
-              <td>{{ str_replace('_', ' ', $log->role->value) }}</td>
+              <td>{{ str_replace('_', ' ', $log->role) }}</td>
               <td>
-                @php $status = $log->approval?->status?->value ?? 'pending'; @endphp
+                @php $status = $log->approval?->status ?? 'pending'; @endphp
                 @if ($status === 'approved')
                   <span class="badge bg-label-success">{{ __('app.approved') }}</span>
                 @elseif($status === 'rejected')

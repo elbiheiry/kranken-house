@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\OperationRoleOption;
 use App\Models\Procedure;
 use App\Models\Resident;
 use App\Models\TrainingRequirement;
@@ -11,6 +12,14 @@ class ProgressCalculator
   public static function expectedByTrainingYear(Resident $resident, TrainingRequirement $requirement): int
   {
     $year = max(1, min(6, $resident->training_year));
+
+    $target = $requirement->procedure
+      ?->yearlyTargets
+      ?->firstWhere('training_year', $year);
+
+    if ($target) {
+      return (int) $target->required_cases;
+    }
 
     if ($year <= 3) {
       return (int) round(($requirement->expected_by_r3 / 3) * $year);
@@ -56,9 +65,18 @@ class ProgressCalculator
 
   public static function completedCount(Resident $resident, Procedure $procedure): int
   {
+    $qualifyingRoles = OperationRoleOption::query()
+      ->where('counts_towards_progress', true)
+      ->pluck('code')
+      ->all();
+
+    if (empty($qualifyingRoles)) {
+      $qualifyingRoles = ['first_assistant', 'primary', 'supervised_primary'];
+    }
+
     return $resident->caseLogs()
       ->where('procedure_id', $procedure->id)
-      ->whereIn('role', ['first_assistant', 'primary', 'supervised_primary'])
+      ->whereIn('role', $qualifyingRoles)
       ->whereHas('approval', fn($query) => $query->where('status', 'approved'))
       ->count();
   }

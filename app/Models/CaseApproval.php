@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\ApprovalStatus;
-use App\Enums\OperationRole;
 use App\Models\CaseLog;
 use App\Models\Procedure;
 use App\Models\User;
@@ -28,8 +26,6 @@ class CaseApproval extends Model
   protected function casts(): array
   {
     return [
-      'status' => ApprovalStatus::class,
-      'approved_role' => OperationRole::class,
       'decided_at' => 'datetime',
     ];
   }

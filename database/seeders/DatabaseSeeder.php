@@ -2,14 +2,19 @@
 
 namespace Database\Seeders;
 
+use App\Models\ApprovalStatusOption;
 use App\Models\Assignment;
 use App\Models\CaseApproval;
 use App\Models\CaseLog;
+use App\Models\OperationRoleOption;
+use App\Models\OperationTypeOption;
 use App\Models\Procedure;
+use App\Models\ProcedureYearlyTarget;
 use App\Models\Resident;
 use App\Models\SystemNotification;
 use App\Models\TrainingRequirement;
 use App\Models\User;
+use App\Models\UserRoleOption;
 use App\Support\ProgressCalculator;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -24,6 +29,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->seedReferenceData();
+
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            ['name' => 'System Administrator', 'role' => 'administrator', 'password' => Hash::make('password')]
+        );
+
         $director = User::updateOrCreate(
             ['email' => 'director@example.com'],
             ['name' => 'Training Director', 'role' => 'director', 'password' => Hash::make('password')]
@@ -80,6 +92,8 @@ class DatabaseSeeder extends Seeder
                     'expected_by_r3' => $definition['expected'],
                 ]
             );
+
+            $this->seedYearlyTargets($procedure, $definition['required'], $definition['expected']);
 
             return $procedure->load('trainingRequirement');
         });
@@ -183,6 +197,90 @@ class DatabaseSeeder extends Seeder
                     'read_at' => $n === 3 ? null : now()->subDays($n),
                 ]);
             }
+        }
+    }
+
+    private function seedReferenceData(): void
+    {
+        $roles = [
+            ['code' => 'administrator', 'label' => 'Administrator', 'is_system' => true],
+            ['code' => 'director', 'label' => 'Director', 'is_system' => true],
+            ['code' => 'supervisor', 'label' => 'Supervisor', 'is_system' => true],
+            ['code' => 'resident', 'label' => 'Resident', 'is_system' => true],
+        ];
+
+        foreach ($roles as $role) {
+            UserRoleOption::query()->updateOrCreate(
+                ['code' => $role['code']],
+                ['label' => $role['label'], 'is_system' => $role['is_system']]
+            );
+        }
+
+        $operationTypes = [
+            ['code' => 'elective', 'label' => 'Elective'],
+            ['code' => 'emergency', 'label' => 'Emergency'],
+        ];
+
+        foreach ($operationTypes as $operationType) {
+            OperationTypeOption::query()->updateOrCreate(
+                ['code' => $operationType['code']],
+                ['label' => $operationType['label']]
+            );
+        }
+
+        $operationRoles = [
+            ['code' => 'assistant', 'label' => 'Assistant', 'counts_towards_progress' => false],
+            ['code' => 'first_assistant', 'label' => 'First Assistant', 'counts_towards_progress' => true],
+            ['code' => 'primary', 'label' => 'Primary Surgeon', 'counts_towards_progress' => true],
+            ['code' => 'supervised_primary', 'label' => 'Supervised Primary Surgeon', 'counts_towards_progress' => true],
+        ];
+
+        foreach ($operationRoles as $operationRole) {
+            OperationRoleOption::query()->updateOrCreate(
+                ['code' => $operationRole['code']],
+                [
+                    'label' => $operationRole['label'],
+                    'counts_towards_progress' => $operationRole['counts_towards_progress'],
+                ]
+            );
+        }
+
+        foreach (
+            [
+                ['code' => 'pending', 'label' => 'Pending'],
+                ['code' => 'approved', 'label' => 'Approved'],
+                ['code' => 'rejected', 'label' => 'Rejected'],
+            ] as $status
+        ) {
+            ApprovalStatusOption::query()->updateOrCreate(
+                ['code' => $status['code']],
+                ['label' => $status['label']]
+            );
+        }
+    }
+
+    private function seedYearlyTargets(Procedure $procedure, int $requiredByEndOfProgram, int $expectedByR3): void
+    {
+        $distribution = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0];
+
+        $r1toR3Base = intdiv($expectedByR3, 3);
+        $r1toR3Remainder = $expectedByR3 % 3;
+        foreach ([1, 2, 3] as $index => $year) {
+            $distribution[$year] = $r1toR3Base + ($index < $r1toR3Remainder ? 1 : 0);
+        }
+
+        $remaining = max(0, $requiredByEndOfProgram - $expectedByR3);
+        $r4toR6Base = intdiv($remaining, 3);
+        $r4toR6Remainder = $remaining % 3;
+        foreach ([4, 5, 6] as $index => $year) {
+            $distribution[$year] = $r4toR6Base + ($index < $r4toR6Remainder ? 1 : 0);
+        }
+
+        foreach ($distribution as $year => $requiredCases) {
+            ProcedureYearlyTarget::query()->updateOrCreate(
+                ['procedure_id' => $procedure->id, 'training_year' => $year],
+                ['required_cases' => $requiredCases]
+            );
         }
     }
 }

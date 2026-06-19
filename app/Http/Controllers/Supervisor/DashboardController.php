@@ -22,7 +22,7 @@ class DashboardController extends Controller
     $approvedCount = (clone $baseQuery)->where('status', 'approved')->count();
     $rejectedCount = (clone $baseQuery)->where('status', 'rejected')->count();
 
-    $procedures = Procedure::with('trainingRequirement')->orderBy('name')->get();
+    $procedures = Procedure::with(['trainingRequirement', 'yearlyTargets'])->orderBy('name')->get();
     $behindResidents = Resident::query()->with('user')->orderBy('training_year')->orderBy('id')->get()
       ->map(function (Resident $resident) use ($procedures) {
         $completedTotal = 0;

@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\OperationRole;
-use App\Enums\OperationType;
 use App\Models\CaseApproval;
 use App\Models\Procedure;
 use App\Models\Resident;
@@ -32,8 +30,6 @@ class CaseLog extends Model
   protected function casts(): array
   {
     return [
-      'operation_type' => OperationType::class,
-      'role' => OperationRole::class,
       'operation_date' => 'date',
     ];
   }

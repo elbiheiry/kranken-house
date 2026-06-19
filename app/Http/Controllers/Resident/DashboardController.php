@@ -28,7 +28,7 @@ class DashboardController extends Controller
     $pendingCount = (clone $baseQuery)->whereHas('approval', fn($query) => $query->where('status', 'pending'))->count();
     $rejectedCount = (clone $baseQuery)->whereHas('approval', fn($query) => $query->where('status', 'rejected'))->count();
 
-    $procedures = Procedure::with('trainingRequirement')->orderBy('name', 'asc')->get();
+    $procedures = Procedure::with(['trainingRequirement', 'yearlyTargets'])->orderBy('name', 'asc')->get();
     $progressRows = [];
 
     foreach ($procedures as $procedure) {
@@ -122,7 +122,7 @@ class DashboardController extends Controller
 
   private function buildResidentProgressRows(Collection $residents): Collection
   {
-    $procedures = Procedure::with('trainingRequirement')->orderBy('name', 'asc')->get();
+    $procedures = Procedure::with(['trainingRequirement', 'yearlyTargets'])->orderBy('name', 'asc')->get();
 
     return $residents->map(function (Resident $resident) use ($procedures) {
       $completedTotal = 0;

@@ -64,6 +64,15 @@
     </div>
   </div>
 
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="card-title m-0 me-2">{{ __('app.operating_activity_last_2_weeks') }}</h5>
+    </div>
+    <div class="card-body">
+      <div id="directorOperatingActivityChart" style="min-height: 320px;"></div>
+    </div>
+  </div>
+
   <div class="row g-4 mb-4">
     <div class="col-lg-6">
       <div class="card h-100">
@@ -113,7 +122,8 @@
                     <div class="mb-1">
                       {{ $residentProgress['resident_name'] }} (R{{ $residentProgress['training_year'] }})
                       <span class="text-muted">- {{ $residentProgress['progress_percent'] }}%
-                        ({{ $residentProgress['completed'] }}/{{ $residentProgress['expected'] }})</span>
+                        ({{ $residentProgress['completed'] }}/{{ $residentProgress['expected'] }})
+                      </span>
                     </div>
                   @endforeach
                 </td>
@@ -308,6 +318,48 @@
           }
         });
         statusChart.render();
+      }
+
+      var activityEl = document.querySelector('#directorOperatingActivityChart');
+      if (activityEl) {
+        var activityChart = new ApexCharts(activityEl, {
+          chart: {
+            type: 'bar',
+            height: 320,
+            toolbar: {
+              show: false
+            }
+          },
+          plotOptions: {
+            bar: {
+              horizontal: true,
+              borderRadius: 4,
+              barHeight: '58%'
+            }
+          },
+          series: [{
+              name: @json(__('app.operation_count_series')),
+              data: @json($activityOperationsSeries)
+            },
+            {
+              name: @json(__('app.assistance_count_series')),
+              data: @json($activityAssistanceSeries)
+            }
+          ],
+          xaxis: {
+            categories: @json($activityLabels),
+            min: 0
+          },
+          colors: ['#03c3ec', '#8592a3'],
+          dataLabels: {
+            enabled: true
+          },
+          legend: {
+            position: 'top'
+          }
+        });
+
+        activityChart.render();
       }
 
       var yearFilter = document.getElementById('directorYearFilter');

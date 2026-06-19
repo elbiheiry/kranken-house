@@ -33,8 +33,11 @@
           <div class="col-md-6">
             <label class="form-label">{{ __('app.operation_type') }}</label>
             <select class="form-select @error('operation_type') is-invalid @enderror" name="operation_type" required>
-              <option value="elective" @selected(old('operation_type', 'elective') === 'elective')>{{ __('app.elective') }}</option>
-              <option value="emergency" @selected(old('operation_type') === 'emergency')>{{ __('app.emergency') }}</option>
+              @foreach ($operationTypes as $type)
+                <option value="{{ $type->code }}" @selected(old('operation_type', $loop->first ? $type->code : null) === $type->code)>
+                  {{ $type->label }}
+                </option>
+              @endforeach
             </select>
             @error('operation_type')
               <div class="invalid-feedback">{{ $message }}</div>
@@ -51,10 +54,11 @@
           <div class="col-md-6">
             <label class="form-label">{{ __('app.role_in_operation') }}</label>
             <select class="form-select @error('role') is-invalid @enderror" name="role" required>
-              <option value="assistant" @selected(old('role') === 'assistant')>{{ __('app.assistant') }}</option>
-              <option value="first_assistant" @selected(old('role') === 'first_assistant')>{{ __('app.first_assistant') }}</option>
-              <option value="primary" @selected(old('role') === 'primary')>{{ __('app.primary_surgeon') }}</option>
-              <option value="supervised_primary" @selected(old('role') === 'supervised_primary')>{{ __('app.supervised_primary') }}</option>
+              @foreach ($operationRoles as $role)
+                <option value="{{ $role->code }}" @selected(old('role', $loop->first ? $role->code : null) === $role->code)>
+                  {{ $role->label }}
+                </option>
+              @endforeach
             </select>
             @error('role')
               <div class="invalid-feedback">{{ $message }}</div>

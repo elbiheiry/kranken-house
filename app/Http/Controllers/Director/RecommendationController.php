@@ -7,19 +7,20 @@ use App\Models\Assignment;
 use App\Models\CaseLog;
 use App\Models\Procedure;
 use App\Models\Resident;
+use App\Support\NotificationService;
 use App\Support\ProgressCalculator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class RecommendationController extends Controller
 {
-  public function store(Request $request): RedirectResponse
+  public function store(Request $request, NotificationService $notificationService): RedirectResponse
   {
     $validated = $request->validate([
       'procedure_id' => ['required', 'exists:procedures,id'],
     ]);
 
-    $procedure = Procedure::with('trainingRequirement')->findOrFail($validated['procedure_id']);
+    $procedure = Procedure::with(['trainingRequirement', 'yearlyTargets'])->findOrFail($validated['procedure_id']);
 
     $best = Resident::with('user')
       ->get()
@@ -54,7 +55,7 @@ class RecommendationController extends Controller
       return back()->with('status', __('app.flash_no_resident_data'));
     }
 
-    Assignment::create([
+    $assignment = Assignment::create([
       'resident_id' => $best['resident']->id,
       'procedure_id' => $procedure->id,
       'recommended_by_id' => $request->user()->id,
@@ -68,6 +69,14 @@ class RecommendationController extends Controller
       ),
       'status' => 'suggested',
     ]);
+
+    $notificationService->notifyAllExcept(
+      $request->user()->id,
+      'assignment-created',
+      'New procedure recommendation',
+      sprintf('%s recommended %s for %s.', $request->user()->name, $best['resident']->user->name, $procedure->name),
+      ['assignment_id' => $assignment->id]
+    );
 
     return back()->with('status', sprintf('Recommended resident: %s for %s.', $best['resident']->user->name, $procedure->name));
   }

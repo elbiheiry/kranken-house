@@ -1,0 +1,171 @@
+﻿Surgical Residency Training Management System
+MVP Scope &amp; Technical Work Plan
+Project Overview
+A web-based platform designed to manage and monitor surgical residency training through digital operation logging, approval workflows, progress tracking, and competency-based reporting.
+The system aims to improve transparency in operative exposure and simplify training management within surgical residency programs.
+Project Objectives
+Digitize surgical training records
+Track operative experience for residents
+Provide structured approval workflows
+Monitor training progress against requirements
+Support training directors with centralized dashboards
+Improve fairness and visibility in case distribution
+User Roles
+1. Resident
+Residents can:
+Log surgical operations
+View personal progress
+Track completed procedures
+Monitor approval/rejection status
+Users can see otherâ€™
+s progress
+2. Supervisor
+Supervisors can:
+Review submitted operations
+Approve or reject cases
+Edit operation details if necessary
+Add educational feedback
+3. Training Director
+Training directors can:
+Monitor all residents
+View department-wide progress
+Identify residents falling behind
+Analyze procedure distribution
+Review overall training statistics
+Notifications about each 
+resident
+ (30 days interval
+)
+MVP Features
+Authentication &amp; Access Control
+Secure login system
+Role-based access permissions
+User account management
+Resident Case Logging Module
+Residents can submit surgical cases including:
+Procedure name/type
+Anonymous case ID
+Emergency or elective classification
+Difficulty level
+Resident role in operation
+Supervisor assignment
+Operation date
+Approval Workflow Module
+Supervisors can:
+Approve submitted cases
+Reject submitted cases
+Modify operation role/category
+Add educational feedback
+Progress Tracking Module
+The system will calculate:
+Completed procedures
+Required procedures
+Progress percentage
+Training completion status
+Dashboard &amp; Reporting
+Resident Dashboard
+Displays:
+Personal progress
+Procedure completion statistics
+Recent logged operations
+Approval status
+Training Director Dashboard
+Displays:
+All residents overview
+Procedure distribution
+Completion percentages
+Residents at risk
+Department statistics
+Progress Status Indicators
+The dashboard will include color-coded indicators:
+Green â†’ On track
+Yellow â†’ At risk
+Red â†’ Behind schedule
+Procedure Requirements Management
+Administrators can define:
+Procedure categories
+Required number of procedures
+Expected progress by training year
+Example:
+Appendectomy
+Hernia Repair
+Cholecystectomy
+Colorectal Surgery
+Emergency Laparotomy
+Database Structure
+Core database tables:
+Users
+Residents
+Procedures
+Training Requirements
+Case Logs
+Approvals
+Security Considerations
+No patient-identifiable data stored
+Anonymous case identifiers only
+Role-based access control
+Secure authentication system
+Technology Stack
+Backend
+Laravel
+ 12
+Frontend
+Blade Templates + Bootstrap/
+AdminLTE
+Database
+MySQL
+Charts &amp; Visualization
+Chart.js / 
+ApexCharts
+Recommended Development Approach
+Phase 1 â€” MVP Demo
+Focus on:
+Authentication
+Surgical case logging
+Approval workflow
+Dashboard analytics
+Progress tracking
+Estimated Development Timeline
+<w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblCellSpacing w:w="15" w:type="dxa"/><w:tblCellMar><w:top w:w="15" w:type="dxa"/><w:left w:w="15" w:type="dxa"/><w:bottom w:w="15" w:type="dxa"/><w:right w:w="15" w:type="dxa"/></w:tblCellMar><w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/></w:tblPr><w:tblGrid><w:gridCol w:w="3095"/><w:gridCol w:w="2109"/></w:tblGrid><w:tr w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidTr="002A3B49"><w:trPr><w:tblHeader/><w:tblCellSpacing w:w="15" w:type="dxa"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:jc w:val="center"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:b/><w:bCs/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:b/><w:bCs/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>Task
+<w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:jc w:val="center"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:b/><w:bCs/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:b/><w:bCs/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>Estimated Duration
+<w:trPr><w:tblCellSpacing w:w="15" w:type="dxa"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>Project Setup &amp; Authentication
+<w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>1 Day
+<w:trPr><w:tblCellSpacing w:w="15" w:type="dxa"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>Database &amp; Models
+<w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>0.5 Day
+<w:trPr><w:tblCellSpacing w:w="15" w:type="dxa"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>Resident Case Logging
+<w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>1 Day
+<w:trPr><w:tblCellSpacing w:w="15" w:type="dxa"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>Approval Workflow
+<w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>1 Day
+<w:trPr><w:tblCellSpacing w:w="15" w:type="dxa"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>Dashboard &amp; Reporting
+<w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>1â€“2 Days
+<w:trPr><w:tblCellSpacing w:w="15" w:type="dxa"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>UI Polishing &amp; Testing
+<w:tcPr><w:tcW w:w="0" w:type="auto"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="002A3B49" w:rsidRPr="002A3B49" w:rsidRDefault="002A3B49" w:rsidP="002A3B49"><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="002A3B49"><w:rPr><w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>1 Day
+Estimated MVP Delivery
+3â€“5 Working Days
+Deliverables
+Web-based MVP platform
+Responsive dashboard
+Role-based access system
+Demo-ready sample data
+MySQL database structure
+Deployable 
+Laravel
+ project
+Future Expansion Possibilities
+Mobile application
+Notification system
+Advanced reporting
+Multi-department support
+Scheduling integration
+PDF exports
+Audit logs
+Hospital integrations
+The proposed MVP (Phase 1) includes the core workflow required for demonstration and validation purposes, including surgical case logging, approval workflows, progress tracking dashboards, and reporting modules.
+Estimated delivery timeline
+:
+3â€“5 working days.
+Estimated MVP cost
+:
+$700
+ depending on final UI requirements, deployment scope, and requested refinements.
+Additional advanced features and production-scale enhancements can be planned in future phases.

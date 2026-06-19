@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Director;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CaseApproval;
+use App\Models\CaseLog;
 use App\Models\Procedure;
 use App\Models\Resident;
 use App\Support\ProgressCalculator;
@@ -16,7 +17,7 @@ class DashboardController extends Controller
 {
   public function index(): View
   {
-    $procedures = Procedure::with('trainingRequirement')->orderBy('name')->get();
+    $procedures = Procedure::with(['trainingRequirement', 'yearlyTargets'])->orderBy('name')->get();
     $residents = Resident::with('user')->orderBy('training_year')->get();
 
     $rows = [];
@@ -61,6 +62,47 @@ class DashboardController extends Controller
       ->groupBy(fn(CaseApproval $approval) => $approval->decided_at?->format('Y-m'));
 
     $monthlySeries = $months->map(fn(string $month) => $monthlyApprovals->get($month)?->count() ?? 0)->values();
+
+    $activityStart = Carbon::now()->subDays(14)->startOfDay();
+    $activityResidents = Resident::query()->with('user')->orderBy('training_year')->orderBy('id')->get();
+
+    $recentLogsByResident = CaseLog::query()
+      ->where('operation_date', '>=', $activityStart->toDateString())
+      ->get(['resident_id', 'role'])
+      ->groupBy('resident_id');
+
+    $activityRows = $activityResidents
+      ->map(function (Resident $resident) use ($recentLogsByResident) {
+        $residentLogs = $recentLogsByResident->get($resident->id, collect());
+
+        $operationsCount = $residentLogs
+          ->filter(fn(CaseLog $log) => in_array($log->role, ['primary', 'supervised_primary'], true))
+          ->count();
+
+        $assistanceCount = $residentLogs
+          ->filter(fn(CaseLog $log) => in_array($log->role, ['assistant', 'first_assistant'], true))
+          ->count();
+
+        return [
+          'resident_name' => $resident->user->name,
+          'operations_count' => $operationsCount,
+          'assistance_count' => $assistanceCount,
+          'total' => $operationsCount + $assistanceCount,
+        ];
+      })
+      ->filter(fn(array $row) => $row['total'] > 0)
+      ->values();
+
+    if ($activityRows->isEmpty()) {
+      $activityRows = $activityResidents
+        ->map(fn(Resident $resident) => [
+          'resident_name' => $resident->user->name,
+          'operations_count' => 0,
+          'assistance_count' => 0,
+          'total' => 0,
+        ])
+        ->values();
+    }
 
     $recommendationRows = $procedures
       ->filter(fn(Procedure $procedure) => (bool) $procedure->trainingRequirement)
@@ -116,6 +158,9 @@ class DashboardController extends Controller
       'statusCounts' => $statusCounts,
       'chartLabels' => $months->values(),
       'chartSeries' => $monthlySeries,
+      'activityLabels' => $activityRows->pluck('resident_name')->all(),
+      'activityOperationsSeries' => $activityRows->pluck('operations_count')->all(),
+      'activityAssistanceSeries' => $activityRows->pluck('assistance_count')->all(),
     ]);
   }
 
@@ -136,7 +181,7 @@ class DashboardController extends Controller
 
   private function buildResidentProgressRows(Collection $residents): Collection
   {
-    $procedures = Procedure::with('trainingRequirement')->orderBy('name')->get();
+    $procedures = Procedure::with(['trainingRequirement', 'yearlyTargets'])->orderBy('name')->get();
 
     return $residents->map(function (Resident $resident) use ($procedures) {
       $completedTotal = 0;

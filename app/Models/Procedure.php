@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Assignment;
 use App\Models\CaseLog;
+use App\Models\ProcedureYearlyTarget;
 use App\Models\TrainingRequirement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -40,5 +41,10 @@ class Procedure extends Model
   public function assignments(): HasMany
   {
     return $this->hasMany(Assignment::class);
+  }
+
+  public function yearlyTargets(): HasMany
+  {
+    return $this->hasMany(ProcedureYearlyTarget::class);
   }
 }

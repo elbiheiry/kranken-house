@@ -108,7 +108,12 @@
                 <tr>
                   <td>{{ $approval->caseLog->case_code }}</td>
                   <td>{{ $approval->caseLog->resident->user->name }}</td>
-                  <td>{{ $approval->caseLog->procedure->name }}</td>
+                  <td>
+                    {{ $approval->caseLog->procedure->name }}
+                    @if ($approval->caseLog->is_external)
+                      <span class="badge bg-label-info ms-1">{{ __('app.external_case_short') }}</span>
+                    @endif
+                  </td>
                   <td>{{ $approval->caseLog->operation_date?->format('Y-m-d') }}</td>
                   <td><span class="badge bg-label-warning">{{ __('app.pending') }}</span></td>
                 </tr>

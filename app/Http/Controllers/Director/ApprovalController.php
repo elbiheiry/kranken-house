@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Supervisor;
+namespace App\Http\Controllers\Director;
 
+use App\Http\Controllers\Controller;
 use App\Models\ApprovalStatusOption;
 use App\Models\CaseApproval;
 use App\Models\OperationRoleOption;
 use App\Models\Procedure;
-use App\Models\User;
-use App\Http\Controllers\Controller;
 use App\Support\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -27,7 +25,6 @@ class ApprovalController extends Controller
 
     $approvalsQuery = CaseApproval::query()
       ->with(['caseLog.resident.user', 'caseLog.procedure'])
-      ->where('supervisor_id', Auth::id())
       ->where('status', 'pending');
 
     if ($caseScope === 'external') {
@@ -43,7 +40,7 @@ class ApprovalController extends Controller
       ->paginate(20)
       ->withQueryString();
 
-    return view('supervisor.approvals-index', [
+    return view('director.approvals-index', [
       'approvals' => $approvals,
       'caseScope' => $caseScope,
       'decisionStatuses' => ApprovalStatusOption::query()
@@ -60,8 +57,6 @@ class ApprovalController extends Controller
 
   public function update(Request $request, CaseApproval $approval, NotificationService $notificationService): RedirectResponse
   {
-    abort_unless($approval->supervisor_id === Auth::id(), 403);
-
     $allowedStatuses = ApprovalStatusOption::query()
       ->where(function ($query) {
         $query->where('code', 'approved')
@@ -84,7 +79,7 @@ class ApprovalController extends Controller
       'decided_at' => now(),
     ]);
 
-    // Supervisors are allowed to correct role/procedure categorization during review.
+    // Directors can also correct role/procedure categorization during review.
     $approval->caseLog()->update([
       'role' => $validated['approved_role'] ?? $approval->caseLog->role,
       'procedure_id' => $validated['approved_procedure_id'] ?? $approval->caseLog->procedure_id,
@@ -92,19 +87,8 @@ class ApprovalController extends Controller
 
     $approval->loadMissing('caseLog.resident.user');
 
-    $directorIds = User::query()
-      ->where('role', 'director')
-      ->pluck('id')
-      ->all();
-
-    $recipientIds = collect($directorIds)
-      ->push($approval->caseLog->resident->user_id)
-      ->unique()
-      ->values()
-      ->all();
-
     $notificationService->notifyUsers(
-      $recipientIds,
+      [$approval->caseLog->resident->user_id],
       'case-approval-updated',
       'Case approval decision',
       sprintf(

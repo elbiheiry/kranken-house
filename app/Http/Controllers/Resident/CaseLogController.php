@@ -57,13 +57,15 @@ class CaseLogController extends Controller
       'difficulty_level' => ['required', 'integer', 'min:1', 'max:5'],
       'role'            => ['required', Rule::in($operationRoleCodes)],
       'operation_date'  => ['required', 'date', 'before_or_equal:today'],
-      'supervisor_id'   => ['nullable', 'exists:users,id'],
+      'supervisor_id'   => ['nullable', Rule::exists('users', 'id')->where('role', 'supervisor')],
+      'is_external'     => ['sometimes', 'boolean'],
       'note'            => ['nullable', 'string', 'max:1000'],
     ]);
 
     $log = CaseLog::create([
       'resident_id' => $resident->id,
       ...$validated,
+      'is_external' => (bool) ($validated['is_external'] ?? false),
     ]);
 
     $assignedSupervisorId = $validated['supervisor_id'] ?? User::query()->where('role', 'supervisor')->value('id');
@@ -90,7 +92,12 @@ class CaseLogController extends Controller
       $recipientIds,
       'case-log-created',
       'New case log submitted',
-      sprintf('%s submitted case %s for approval.', $request->user()->name, $log->case_code),
+      sprintf(
+        '%s submitted %s%s for approval.',
+        $request->user()->name,
+        $log->is_external ? 'external case ' : 'case ',
+        $log->case_code,
+      ),
       ['case_log_id' => $log->id]
     );
 

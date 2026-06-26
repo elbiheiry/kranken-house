@@ -84,6 +84,14 @@
               <div class="invalid-feedback">{{ $message }}</div>
             @enderror
           </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check mb-1">
+              <input class="form-check-input" type="checkbox" name="is_external" value="1" id="isExternalCase"
+                @checked(old('is_external'))>
+              <label class="form-check-label" for="isExternalCase">{{ __('app.external_case') }}</label>
+              <div class="form-text">{{ __('app.external_case_hint') }}</div>
+            </div>
+          </div>
           <div class="col-12">
             <label class="form-label">{{ __('app.note') }}</label>
             <textarea class="form-control @error('note') is-invalid @enderror" name="note" rows="3">{{ old('note') }}</textarea>

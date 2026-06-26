@@ -23,7 +23,12 @@
             <tr>
               <td>{{ $log->operation_date?->format('Y-m-d') }}</td>
               <td>{{ $log->case_code }}</td>
-              <td>{{ $log->procedure->name }}</td>
+              <td>
+                {{ $log->procedure->name }}
+                @if ($log->is_external)
+                  <span class="badge bg-label-info ms-1">{{ __('app.external_case_short') }}</span>
+                @endif
+              </td>
               <td>{{ str_replace('_', ' ', $log->role) }}</td>
               <td>
                 @php $status = $log->approval?->status ?? 'pending'; @endphp

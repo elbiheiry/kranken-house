@@ -39,7 +39,7 @@
               <td>{{ $approval->caseLog->operation_date?->format('Y-m-d') }}</td>
               <td>{{ str_replace('_', ' ', $approval->caseLog->role) }}</td>
               <td>
-                <form method="post" action="{{ route('supervisor.approvals.update', $approval) }}" class="row g-2">
+                <form method="post" action="{{ route('director.approvals.update', $approval) }}" class="row g-2">
                   @csrf
                   @method('patch')
                   <div class="col-md-4">

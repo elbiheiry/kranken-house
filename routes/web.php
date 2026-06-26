@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ProcedureManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Director\DashboardController;
+use App\Http\Controllers\Director\ApprovalController as DirectorApprovalController;
 use App\Http\Controllers\Director\RecommendationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Resident\DashboardController as ResidentDashboardController;
@@ -71,6 +72,8 @@ Route::middleware('auth')->group(function () {
   Route::prefix('director')->name('director.')->middleware('role:director')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/residents-progress', [DashboardController::class, 'residentsProgress'])->name('residents-progress');
+    Route::get('/approvals', [DirectorApprovalController::class, 'index'])->name('approvals.index');
+    Route::patch('/approvals/{approval}', [DirectorApprovalController::class, 'update'])->name('approvals.update');
     Route::post('/recommendations', [RecommendationController::class, 'store'])->name('recommendations.store');
   });
 

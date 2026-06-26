@@ -19,6 +19,7 @@ class CaseLog extends Model
     'resident_id',
     'procedure_id',
     'case_code',
+    'is_external',
     'operation_type',
     'difficulty_level',
     'role',
@@ -31,6 +32,7 @@ class CaseLog extends Model
   {
     return [
       'operation_date' => 'date',
+      'is_external' => 'bool',
     ];
   }
 

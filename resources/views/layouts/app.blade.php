@@ -80,6 +80,12 @@
                   <div>{{ __('app.director_dashboard') }}</div>
                 </a>
               </li>
+              <li class="menu-item {{ request()->routeIs('director.approvals.index') ? 'active' : '' }}">
+                <a href="{{ route('director.approvals.index') }}" class="menu-link">
+                  <i class="menu-icon tf-icons bx bx-check-shield"></i>
+                  <div>{{ __('app.pending_approvals') }}</div>
+                </a>
+              </li>
               <li class="menu-item {{ request()->routeIs('director.residents-progress') ? 'active' : '' }}">
                 <a href="{{ route('director.residents-progress') }}" class="menu-link">
                   <i class="menu-icon tf-icons bx bx-user-pin"></i>

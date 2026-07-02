@@ -70,6 +70,44 @@
     </div>
     <div class="card-body">
       <div id="directorOperatingActivityChart" style="min-height: 320px;"></div>
+
+      <h6 class="mt-4 mb-2">{{ __('app.operating_activity_details') }}</h6>
+      <div class="table-responsive text-nowrap">
+        <table class="table table-sm">
+          <thead class="table-light">
+            <tr>
+              <th>{{ __('app.col_resident') }}</th>
+              <th>{{ __('app.col_total_cases') }}</th>
+              <th>{{ __('app.operation_count_series') }}</th>
+              <th>{{ __('app.operations_performed') }}</th>
+              <th>{{ __('app.assistance_count_series') }}</th>
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            @forelse($activityDetails as $detail)
+              <tr>
+                <td>{{ $detail['resident_name'] }}</td>
+                <td>{{ $detail['total_cases'] }}</td>
+                <td>{{ $detail['operations_count'] }}</td>
+                <td>
+                  @if (!empty($detail['operation_breakdown']))
+                    @foreach ($detail['operation_breakdown'] as $breakdown)
+                      <div class="mb-1">{{ $breakdown['procedure_name'] }} ({{ $breakdown['count'] }})</div>
+                    @endforeach
+                  @else
+                    <span class="text-muted">{{ __('app.no_operation_breakdown') }}</span>
+                  @endif
+                </td>
+                <td>{{ $detail['assistance_count'] }}</td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="5" class="text-center text-muted">{{ __('app.no_progress_data') }}</td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 

@@ -125,6 +125,12 @@ class DashboardController extends Controller
     $procedures = Procedure::with(['trainingRequirement', 'yearlyTargets'])->orderBy('name', 'asc')->get();
 
     return $residents->map(function (Resident $resident) use ($procedures) {
+      $caseLogs = $resident->caseLogs()
+        ->with('procedure:id,name')
+        ->orderByDesc('operation_date')
+        ->orderByDesc('id')
+        ->get(['id', 'resident_id', 'procedure_id', 'role', 'operation_type', 'operation_date', 'is_external']);
+
       $completedTotal = 0;
       $expectedTotal = 0;
       $procedureDetails = [];
@@ -155,6 +161,41 @@ class DashboardController extends Controller
       $ratio = ProgressCalculator::completionRatio($completedTotal, $expectedTotal);
       $status = ProgressCalculator::status($ratio);
 
+      $operationsCount = $caseLogs
+        ->filter(fn(CaseLog $caseLog) => in_array($caseLog->role, ['primary', 'supervised_primary'], true))
+        ->count();
+
+      $assistanceCount = $caseLogs
+        ->filter(fn(CaseLog $caseLog) => in_array($caseLog->role, ['assistant', 'first_assistant'], true))
+        ->count();
+
+      $operationBreakdown = $caseLogs
+        ->filter(fn(CaseLog $caseLog) => in_array($caseLog->role, ['primary', 'supervised_primary'], true))
+        ->groupBy('procedure_id')
+        ->map(function (Collection $procedureLogs) {
+          $firstLog = $procedureLogs->first();
+
+          return [
+            'procedure_name' => $firstLog?->procedure?->name ?? '-',
+            'count' => $procedureLogs->count(),
+          ];
+        })
+        ->sortByDesc('count')
+        ->values()
+        ->all();
+
+      $recentCases = $caseLogs
+        ->take(5)
+        ->map(fn(CaseLog $caseLog) => [
+          'operation_date' => $caseLog->operation_date?->format('Y-m-d') ?? '-',
+          'procedure_name' => $caseLog->procedure?->name ?? '-',
+          'role' => str_replace('_', ' ', $caseLog->role),
+          'operation_type' => $caseLog->operation_type,
+          'is_external' => (bool) $caseLog->is_external,
+        ])
+        ->values()
+        ->all();
+
       return [
         'resident_name' => $resident->user->name,
         'training_year' => $resident->training_year,
@@ -164,6 +205,15 @@ class DashboardController extends Controller
         'status' => $status,
         'status_label' => ProgressCalculator::statusLabel($status),
         'procedure_details' => $procedureDetails,
+        'peer_info' => [
+          'total_case_logs' => $caseLogs->count(),
+          'internal_cases' => $caseLogs->where('is_external', false)->count(),
+          'external_cases' => $caseLogs->where('is_external', true)->count(),
+          'operations_count' => $operationsCount,
+          'assistance_count' => $assistanceCount,
+        ],
+        'operation_breakdown' => $operationBreakdown,
+        'recent_cases' => $recentCases,
       ];
     })->values();
   }

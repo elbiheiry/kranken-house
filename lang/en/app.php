@@ -56,9 +56,19 @@ return [
   'view_total_progress'        => 'View Total Progress',
   'total_progress'             => 'Total Progress',
   'procedure_details'          => 'Procedure Details',
+  'peer_information'           => 'Peer Information',
+  'operation_breakdown'        => 'Operation Breakdown',
+  'recent_cases'               => 'Recent Cases',
+  'operating_activity_details' => 'Operating Activity Details',
   'max_required_by_year'       => 'Maximum Required (By Year)',
   'total_required_all_years'   => 'Total Required (All Years)',
   'performed_by_resident'      => 'Performed By Resident',
+  'operations_performed'       => 'Operations Performed',
+  'total_case_logs'            => 'Total Case Logs',
+  'internal_cases'             => 'Internal Cases',
+  'external_cases'             => 'External Cases',
+  'operations_done'            => 'Operations Done',
+  'assistance_done'            => 'Assistance Done',
   'behind_residents_hint'      => ':count resident(s) are currently behind.',
   'behind_procedures_list'     => 'Behind procedures by resident',
   'filter_training_year'       => 'Filter by training year',
@@ -90,6 +100,7 @@ return [
   'col_year'            => 'Year',
   'col_recommendation'  => 'Recommendation',
   'col_reason'          => 'Reason',
+  'col_total_cases'     => 'Total Cases',
   'col_progress_by_resident_year' => 'Progress By Resident (Year)',
   'col_recommended_residents' => 'Recommended Residents',
 
@@ -101,6 +112,8 @@ return [
   'no_peer_progress'    => 'No peer progress data available.',
   'no_behind_residents' => 'No residents are currently behind.',
   'no_filter_results'   => 'No rows match the selected filters.',
+  'no_operation_breakdown' => 'No operation breakdown available.',
+  'no_recent_cases'     => 'No recent cases available.',
 
   // Case log form
   'log_case_title'      => 'Log Operation Case',
@@ -130,7 +143,12 @@ return [
   'pending_case_approvals' => 'Pending Case Approvals',
   'approve'             => 'Approve',
   'reject'              => 'Reject',
+  'reject_case_log'     => 'Reject Case Log',
+  'review_rejection_details' => 'Review Rejection Details',
+  'current_role'        => 'Current Role',
+  'current_procedure'   => 'Current Procedure',
   'feedback_optional'   => 'Feedback (optional)',
+  'close'               => 'Close',
   'save'                => 'Save',
 
   // Director
@@ -155,6 +173,7 @@ return [
   'flash_case_submitted'   => 'Case log submitted for approval.',
   'flash_review_saved'     => 'Case review saved.',
   'flash_no_resident_data' => 'No resident data available for recommendation.',
+  'unknown_procedure'   => 'Unknown procedure',
 
   // Language switcher
   'language'            => 'Language',

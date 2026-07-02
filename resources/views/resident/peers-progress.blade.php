@@ -60,7 +60,9 @@
                     data-completed-total="{{ $row['completed_total'] }}"
                     data-expected-total="{{ $row['expected_total'] }}"
                     data-progress-percent="{{ $row['progress_percent'] }}"
-                    data-status-label="{{ $row['status_label'] }}" data-procedure-details='@json($row['procedure_details'])'>
+                    data-status-label="{{ $row['status_label'] }}" data-procedure-details='@json($row['procedure_details'])'
+                    data-peer-info='@json($row['peer_info'])' data-operation-breakdown='@json($row['operation_breakdown'])'
+                    data-recent-cases='@json($row['recent_cases'])'>
                     {{ __('app.view_total_progress') }}
                   </button>
                 </td>
@@ -96,6 +98,32 @@
           </div>
           <div class="mb-3"><strong>{{ __('app.col_status') }}:</strong> <span id="peerModalStatus">-</span></div>
 
+          <h6 class="mb-2">{{ __('app.peer_information') }}</h6>
+          <div class="table-responsive text-nowrap mb-3">
+            <table class="table table-sm">
+              <tbody>
+                <tr>
+                  <th>{{ __('app.total_case_logs') }}</th>
+                  <td id="peerModalTotalCaseLogs">-</td>
+                  <th>{{ __('app.internal_cases') }}</th>
+                  <td id="peerModalInternalCases">-</td>
+                </tr>
+                <tr>
+                  <th>{{ __('app.external_cases') }}</th>
+                  <td id="peerModalExternalCases">-</td>
+                  <th>{{ __('app.operations_done') }}</th>
+                  <td id="peerModalOperationsCount">-</td>
+                </tr>
+                <tr>
+                  <th>{{ __('app.assistance_done') }}</th>
+                  <td id="peerModalAssistanceCount">-</td>
+                  <th></th>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <h6 class="mb-2">{{ __('app.procedure_details') }}</h6>
           <div class="table-responsive text-nowrap">
             <table class="table table-sm">
@@ -109,6 +137,35 @@
                 </tr>
               </thead>
               <tbody id="peerModalProcedureDetailsBody"></tbody>
+            </table>
+          </div>
+
+          <h6 class="mb-2 mt-3">{{ __('app.operation_breakdown') }}</h6>
+          <div class="table-responsive text-nowrap">
+            <table class="table table-sm">
+              <thead class="table-light">
+                <tr>
+                  <th>{{ __('app.col_procedure') }}</th>
+                  <th>{{ __('app.operations_done') }}</th>
+                </tr>
+              </thead>
+              <tbody id="peerModalOperationBreakdownBody"></tbody>
+            </table>
+          </div>
+
+          <h6 class="mb-2 mt-3">{{ __('app.recent_cases') }}</h6>
+          <div class="table-responsive text-nowrap">
+            <table class="table table-sm">
+              <thead class="table-light">
+                <tr>
+                  <th>{{ __('app.col_date') }}</th>
+                  <th>{{ __('app.col_procedure') }}</th>
+                  <th>{{ __('app.col_role') }}</th>
+                  <th>{{ __('app.operation_type') }}</th>
+                  <th>{{ __('app.case_type_filter') }}</th>
+                </tr>
+              </thead>
+              <tbody id="peerModalRecentCasesBody"></tbody>
             </table>
           </div>
         </div>
@@ -162,7 +219,13 @@
           var progressPercent = button.getAttribute('data-progress-percent') || '-';
           var statusLabel = button.getAttribute('data-status-label') || '-';
           var procedureDetailsRaw = button.getAttribute('data-procedure-details') || '[]';
+          var peerInfoRaw = button.getAttribute('data-peer-info') || '{}';
+          var operationBreakdownRaw = button.getAttribute('data-operation-breakdown') || '[]';
+          var recentCasesRaw = button.getAttribute('data-recent-cases') || '[]';
           var procedureDetails = [];
+          var peerInfo = {};
+          var operationBreakdown = [];
+          var recentCases = [];
 
           try {
             procedureDetails = JSON.parse(procedureDetailsRaw);
@@ -170,13 +233,36 @@
             procedureDetails = [];
           }
 
+          try {
+            peerInfo = JSON.parse(peerInfoRaw);
+          } catch (error) {
+            peerInfo = {};
+          }
+
+          try {
+            operationBreakdown = JSON.parse(operationBreakdownRaw);
+          } catch (error) {
+            operationBreakdown = [];
+          }
+
+          try {
+            recentCases = JSON.parse(recentCasesRaw);
+          } catch (error) {
+            recentCases = [];
+          }
+
           document.getElementById('peerModalResidentName').textContent = residentName;
           document.getElementById('peerModalResidentYear').textContent = trainingYear ? 'R' + trainingYear :
-          '-';
+            '-';
           document.getElementById('peerModalCompleted').textContent = completedTotal;
           document.getElementById('peerModalExpected').textContent = expectedTotal;
           document.getElementById('peerModalProgress').textContent = progressPercent + '%';
           document.getElementById('peerModalStatus').textContent = statusLabel;
+          document.getElementById('peerModalTotalCaseLogs').textContent = peerInfo.total_case_logs ?? '-';
+          document.getElementById('peerModalInternalCases').textContent = peerInfo.internal_cases ?? '-';
+          document.getElementById('peerModalExternalCases').textContent = peerInfo.external_cases ?? '-';
+          document.getElementById('peerModalOperationsCount').textContent = peerInfo.operations_count ?? '-';
+          document.getElementById('peerModalAssistanceCount').textContent = peerInfo.assistance_count ?? '-';
 
           var detailsBody = document.getElementById('peerModalProcedureDetailsBody');
           if (detailsBody) {
@@ -207,6 +293,51 @@
                   '</span></td>';
 
                 detailsBody.appendChild(tr);
+              });
+            }
+          }
+
+          var operationBreakdownBody = document.getElementById('peerModalOperationBreakdownBody');
+          if (operationBreakdownBody) {
+            operationBreakdownBody.innerHTML = '';
+
+            if (operationBreakdown.length === 0) {
+              var emptyBreakdownRow = document.createElement('tr');
+              emptyBreakdownRow.innerHTML =
+                '<td colspan="2" class="text-center text-muted">{{ __('app.no_operation_breakdown') }}</td>';
+              operationBreakdownBody.appendChild(emptyBreakdownRow);
+            } else {
+              operationBreakdown.forEach(function(detail) {
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                  '<td>' + (detail.procedure_name || '-') + '</td>' +
+                  '<td>' + (detail.count ?? '-') + '</td>';
+                operationBreakdownBody.appendChild(tr);
+              });
+            }
+          }
+
+          var recentCasesBody = document.getElementById('peerModalRecentCasesBody');
+          if (recentCasesBody) {
+            recentCasesBody.innerHTML = '';
+
+            if (recentCases.length === 0) {
+              var emptyCasesRow = document.createElement('tr');
+              emptyCasesRow.innerHTML =
+                '<td colspan="5" class="text-center text-muted">{{ __('app.no_recent_cases') }}</td>';
+              recentCasesBody.appendChild(emptyCasesRow);
+            } else {
+              recentCases.forEach(function(caseItem) {
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                  '<td>' + (caseItem.operation_date || '-') + '</td>' +
+                  '<td>' + (caseItem.procedure_name || '-') + '</td>' +
+                  '<td>' + (caseItem.role || '-') + '</td>' +
+                  '<td>' + (caseItem.operation_type || '-') + '</td>' +
+                  '<td>' + (caseItem.is_external ? @json(__('app.case_type_external')) :
+                    @json(__('app.case_type_internal'))) +
+                  '</td>';
+                recentCasesBody.appendChild(tr);
               });
             }
           }

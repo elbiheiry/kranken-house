@@ -67,26 +67,47 @@ class DashboardController extends Controller
     $activityResidents = Resident::query()->with('user')->orderBy('training_year')->orderBy('id')->get();
 
     $recentLogsByResident = CaseLog::query()
+      ->with('procedure:id,name')
       ->where('operation_date', '>=', $activityStart->toDateString())
-      ->get(['resident_id', 'role'])
+      ->get(['resident_id', 'procedure_id', 'role'])
       ->groupBy('resident_id');
 
     $activityRows = $activityResidents
       ->map(function (Resident $resident) use ($recentLogsByResident) {
         $residentLogs = $recentLogsByResident->get($resident->id, collect());
 
-        $operationsCount = $residentLogs
+        $operationsLogs = $residentLogs
           ->filter(fn(CaseLog $log) => in_array($log->role, ['primary', 'supervised_primary'], true))
-          ->count();
+          ->values();
+
+        $operationsCount = $operationsLogs->count();
 
         $assistanceCount = $residentLogs
           ->filter(fn(CaseLog $log) => in_array($log->role, ['assistant', 'first_assistant'], true))
           ->count();
 
+        $operationBreakdown = $operationsLogs
+          ->groupBy('procedure_id')
+          ->map(function (Collection $procedureLogs) {
+            $firstLog = $procedureLogs->first();
+
+            return [
+              'procedure_name' => $firstLog?->procedure?->name ?? __('app.unknown_procedure'),
+              'count' => $procedureLogs->count(),
+            ];
+          })
+          ->sortByDesc('count')
+          ->values();
+
         return [
           'resident_name' => $resident->user->name,
+          'total_cases' => $residentLogs->count(),
           'operations_count' => $operationsCount,
           'assistance_count' => $assistanceCount,
+          'operation_breakdown' => $operationBreakdown->all(),
+          'operation_summary' => $operationBreakdown
+            ->map(fn(array $item) => $item['procedure_name'] . ' (' . $item['count'] . ')')
+            ->implode(', '),
           'total' => $operationsCount + $assistanceCount,
         ];
       })
@@ -97,8 +118,11 @@ class DashboardController extends Controller
       $activityRows = $activityResidents
         ->map(fn(Resident $resident) => [
           'resident_name' => $resident->user->name,
+          'total_cases' => 0,
           'operations_count' => 0,
           'assistance_count' => 0,
+          'operation_breakdown' => [],
+          'operation_summary' => '',
           'total' => 0,
         ])
         ->values();
@@ -161,6 +185,7 @@ class DashboardController extends Controller
       'activityLabels' => $activityRows->pluck('resident_name')->all(),
       'activityOperationsSeries' => $activityRows->pluck('operations_count')->all(),
       'activityAssistanceSeries' => $activityRows->pluck('assistance_count')->all(),
+      'activityDetails' => $activityRows->all(),
     ]);
   }
 

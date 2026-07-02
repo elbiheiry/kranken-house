@@ -56,9 +56,19 @@ return [
   'view_total_progress'        => 'Gesamtfortschritt anzeigen',
   'total_progress'             => 'Gesamtfortschritt',
   'procedure_details'          => 'Eingriffsdetails',
+  'peer_information'           => 'Informationen zum Assistenzarzt',
+  'operation_breakdown'        => 'Aufschlüsselung der Operationen',
+  'recent_cases'               => 'Letzte Falle',
+  'operating_activity_details' => 'Details zur Operationsaktivitat',
   'max_required_by_year'       => 'Maximal erforderlich (nach Jahr)',
   'total_required_all_years'   => 'Insgesamt erforderlich (alle Jahre)',
   'performed_by_resident'      => 'Vom Assistenzarzt durchgefuhrt',
+  'operations_performed'       => 'Durchgefuhrte Operationen',
+  'total_case_logs'            => 'Gesamte Falldokumentationen',
+  'internal_cases'             => 'Interne Falle',
+  'external_cases'             => 'Externe Falle',
+  'operations_done'            => 'Operationen durchgeführt',
+  'assistance_done'            => 'Assistenz durchgeführt',
   'behind_residents_hint'      => ':count Assistenzarzt(e) liegen derzeit zuruck.',
   'behind_procedures_list'     => 'Zuruckliegende Eingriffe pro Assistenzarzt',
   'filter_training_year'       => 'Nach Ausbildungsjahr filtern',
@@ -90,6 +100,7 @@ return [
   'col_year'            => 'Jahr',
   'col_recommendation'  => 'Empfehlung',
   'col_reason'          => 'Begrundung',
+  'col_total_cases'     => 'Gesamtfalle',
   'col_progress_by_resident_year' => 'Fortschritt je Assistenzarzt (Jahr)',
   'col_recommended_residents' => 'Empfohlene Assistenzarzte',
 
@@ -101,6 +112,8 @@ return [
   'no_peer_progress'    => 'Keine Fortschrittsdaten der Kollegen verfugbar.',
   'no_behind_residents' => 'Derzeit liegt kein Assistenzarzt zuruck.',
   'no_filter_results'   => 'Keine Zeilen entsprechen den gewahlten Filtern.',
+  'no_operation_breakdown' => 'Keine Aufschlüsselung der Operationen verfügbar.',
+  'no_recent_cases'     => 'Keine aktuellen Fälle verfügbar.',
 
   // Case log form
   'log_case_title'      => 'Operationsfall eintragen',
@@ -130,7 +143,12 @@ return [
   'pending_case_approvals' => 'Ausstehende Fallgenehmigungen',
   'approve'             => 'Genehmigen',
   'reject'              => 'Ablehnen',
+  'reject_case_log'     => 'Fall ablehnen',
+  'review_rejection_details' => 'Ablehnungsdetails prüfen',
+  'current_role'        => 'Aktuelle Rolle',
+  'current_procedure'   => 'Aktueller Eingriff',
   'feedback_optional'   => 'Rückmeldung (optional)',
+  'close'               => 'Schließen',
   'save'                => 'Speichern',
 
   // Director
@@ -155,6 +173,7 @@ return [
   'flash_case_submitted'   => 'Fallprotokoll zur Genehmigung eingereicht.',
   'flash_review_saved'     => 'Fallprüfung gespeichert.',
   'flash_no_resident_data' => 'Keine Assistenzarztdaten für die Empfehlung verfügbar.',
+  'unknown_procedure'   => 'Unbekannter Eingriff',
 
   // Language switcher
   'language'            => 'Sprache',

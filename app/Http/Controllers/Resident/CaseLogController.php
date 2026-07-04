@@ -18,6 +18,8 @@ use Illuminate\View\View;
 
 class CaseLogController extends Controller
 {
+  private const RESIDENT_CREATE_ROLE_CODES = ['assistant', 'primary'];
+
   public function index(): View
   {
     $resident = Auth::user()->residentProfile;
@@ -34,7 +36,10 @@ class CaseLogController extends Controller
   public function create(): View
   {
     $operationTypes = OperationTypeOption::query()->orderBy('id', 'asc')->get();
-    $operationRoles = OperationRoleOption::query()->orderBy('id', 'asc')->get();
+    $operationRoles = OperationRoleOption::query()
+      ->whereIn('code', self::RESIDENT_CREATE_ROLE_CODES)
+      ->orderBy('id', 'asc')
+      ->get();
 
     return view('resident.case-log-create', [
       'procedures' => Procedure::query()->orderBy('name', 'asc')->get(),
@@ -48,7 +53,10 @@ class CaseLogController extends Controller
   {
     $resident = Auth::user()->residentProfile;
     $operationTypeCodes = OperationTypeOption::query()->pluck('code')->all();
-    $operationRoleCodes = OperationRoleOption::query()->pluck('code')->all();
+    $operationRoleCodes = OperationRoleOption::query()
+      ->whereIn('code', self::RESIDENT_CREATE_ROLE_CODES)
+      ->pluck('code')
+      ->all();
 
     $validated = $request->validate([
       'case_code'       => ['required', 'string', 'max:64', 'unique:case_logs,case_code,NULL,id,resident_id,' . $resident->id],

@@ -185,6 +185,45 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        $recentRoles = ['assistant', 'primary'];
+        foreach ($residents as $residentIndex => $resident) {
+            for ($i = 0; $i < 3; $i++) {
+                $procedure = $procedureModels[($residentIndex + $i) % $procedureModels->count()];
+                $operationDate = now()->subDays(($residentIndex * 3 + $i * 2) % 14);
+                $role = $recentRoles[($residentIndex + $i) % count($recentRoles)];
+                $supervisorId = $supervisorIds[($residentIndex + $i) % count($supervisorIds)];
+                $status = $i === 2 ? 'pending' : 'approved';
+
+                $log = CaseLog::create([
+                    'resident_id' => $resident->id,
+                    'procedure_id' => $procedure->id,
+                    'case_code' => strtoupper(Str::random(10)),
+                    'operation_type' => $i % 2 === 0 ? 'elective' : 'emergency',
+                    'difficulty_level' => (($residentIndex + $i) % 5) + 1,
+                    'role' => $role,
+                    'operation_date' => $operationDate->toDateString(),
+                    'supervisor_id' => $supervisorId,
+                    'is_external' => (bool) (($residentIndex + $i) % 2),
+                    'note' => 'Recent seeded case from the last two weeks.',
+                ]);
+
+                $decidedAt = $operationDate->copy()->addDay();
+                if ($decidedAt->greaterThan(now())) {
+                    $decidedAt = now();
+                }
+
+                CaseApproval::create([
+                    'case_log_id' => $log->id,
+                    'supervisor_id' => $supervisorId,
+                    'status' => $status,
+                    'feedback' => $status === 'pending' ? null : $feedbackPool[($residentIndex + $i) % count($feedbackPool)],
+                    'approved_role' => $status === 'approved' ? $role : null,
+                    'approved_procedure_id' => $status === 'approved' ? $procedure->id : null,
+                    'decided_at' => $status === 'pending' ? null : $decidedAt,
+                ]);
+            }
+        }
+
         $allUsers = User::all();
         foreach ($allUsers as $user) {
             for ($n = 1; $n <= 3; $n++) {

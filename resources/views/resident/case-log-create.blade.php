@@ -56,7 +56,7 @@
             <select class="form-select @error('role') is-invalid @enderror" name="role" required>
               @foreach ($operationRoles as $role)
                 <option value="{{ $role->code }}" @selected(old('role', $loop->first ? $role->code : null) === $role->code)>
-                  {{ $role->label }}
+                  {{ $role->code === 'primary' ? 'Operator' : $role->label }}
                 </option>
               @endforeach
             </select>

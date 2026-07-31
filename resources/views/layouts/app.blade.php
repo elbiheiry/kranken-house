@@ -112,6 +112,13 @@
                 </a>
               </li>
             @endif
+
+            <li class="menu-item {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+              <a href="{{ route('profile.edit') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user-circle"></i>
+                <div>My Profile</div>
+              </a>
+            </li>
           </ul>
         </aside>
 

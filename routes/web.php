@@ -8,6 +8,7 @@ use App\Http\Controllers\Director\DashboardController;
 use App\Http\Controllers\Director\ApprovalController as DirectorApprovalController;
 use App\Http\Controllers\Director\RecommendationController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Resident\DashboardController as ResidentDashboardController;
 use App\Http\Controllers\Resident\CaseLogController;
 use App\Http\Controllers\Supervisor\DashboardController as SupervisorDashboardController;
@@ -29,6 +30,8 @@ Route::get('/locale/{lang}', function (string $lang) {
 
 Route::middleware('auth')->group(function () {
   Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+  Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+  Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
   Route::get('/', function () {
     $role = Auth::user()->role;

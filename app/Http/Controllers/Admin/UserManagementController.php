@@ -15,6 +15,8 @@ use Illuminate\View\View;
 
 class UserManagementController extends Controller
 {
+  private const EMAIL_DOMAIN = 'stmscaselog.com';
+
   public function index(): View
   {
     return view('admin.users.index', [
@@ -26,7 +28,8 @@ class UserManagementController extends Controller
   {
     return view('admin.users.form', [
       'user' => new User(),
-      'roles' => UserRoleOption::query()->orderBy('label')->get(),
+      'emailUsername' => '',
+      'roles' => UserRoleOption::query()->orderBy('label', 'asc')->get(),
       'isEdit' => false,
     ]);
   }
@@ -37,15 +40,22 @@ class UserManagementController extends Controller
 
     $validated = $request->validate([
       'name' => ['required', 'string', 'max:255'],
-      'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+      'email' => ['required', 'string', 'max:255'],
       'role' => ['required', Rule::in($roleCodes)],
       'password' => ['required', 'string', 'min:8'],
       'training_year' => ['nullable', 'integer', 'min:1', 'max:6'],
     ]);
 
+    $email = $this->normalizeEmailInput($validated['email']);
+
+    validator(
+      ['email' => $email],
+      ['email' => ['required', 'email', 'max:255', 'unique:users,email']]
+    )->validate();
+
     $user = User::query()->create([
       'name' => $validated['name'],
-      'email' => $validated['email'],
+      'email' => $email,
       'role' => $validated['role'],
       'password' => Hash::make($validated['password']),
     ]);
@@ -67,7 +77,8 @@ class UserManagementController extends Controller
   {
     return view('admin.users.form', [
       'user' => $user,
-      'roles' => UserRoleOption::query()->orderBy('label')->get(),
+      'emailUsername' => $this->extractEmailLocalPart($user->email),
+      'roles' => UserRoleOption::query()->orderBy('label', 'asc')->get(),
       'isEdit' => true,
     ]);
   }
@@ -78,15 +89,22 @@ class UserManagementController extends Controller
 
     $validated = $request->validate([
       'name' => ['required', 'string', 'max:255'],
-      'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+      'email' => ['required', 'string', 'max:255'],
       'role' => ['required', Rule::in($roleCodes)],
       'password' => ['nullable', 'string', 'min:8'],
       'training_year' => ['nullable', 'integer', 'min:1', 'max:6'],
     ]);
 
+    $email = $this->normalizeEmailInput($validated['email']);
+
+    validator(
+      ['email' => $email],
+      ['email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)]]
+    )->validate();
+
     $payload = [
       'name' => $validated['name'],
-      'email' => $validated['email'],
+      'email' => $email,
       'role' => $validated['role'],
     ];
 
@@ -140,5 +158,18 @@ class UserManagementController extends Controller
       ['user_id' => $user->id],
       ['training_year' => $validated['training_year'] ?? 1]
     );
+  }
+
+  private function normalizeEmailInput(string $value): string
+  {
+    $normalized = strtolower(trim($value));
+    $localPart = trim(strtok($normalized, '@') ?: '');
+
+    return $localPart . '@' . self::EMAIL_DOMAIN;
+  }
+
+  private function extractEmailLocalPart(string $email): string
+  {
+    return trim(strtok(strtolower($email), '@') ?: $email);
   }
 }

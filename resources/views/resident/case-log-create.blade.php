@@ -65,7 +65,7 @@
             @enderror
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ __('app.supervisor') }}</label>
+            <label class="form-label">Supervisor / Director</label>
             <select class="form-select @error('supervisor_id') is-invalid @enderror" name="supervisor_id">
               <option value="">{{ __('app.auto_assign') }}</option>
               @foreach ($supervisors as $supervisor)

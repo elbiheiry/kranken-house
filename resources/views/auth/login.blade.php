@@ -19,9 +19,12 @@
           <form method="post" action="{{ route('login.perform') }}" class="mb-4">
             @csrf
             <div class="mb-3">
-              <label for="email" class="form-label">{{ __('app.email') }}</label>
-              <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
-                name="email" value="{{ old('email') }}" required>
+              <label for="email" class="form-label">Username</label>
+              <div class="input-group">
+                <input id="email" type="text" class="form-control @error('email') is-invalid @enderror"
+                  name="email" value="{{ old('email') }}" required autocomplete="username" placeholder="john.doe">
+                <span class="input-group-text">@stmscaselog.com</span>
+              </div>
               @error('email')
                 <div class="invalid-feedback">{{ $message }}</div>
               @enderror

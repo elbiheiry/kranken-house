@@ -21,9 +21,12 @@
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-              value="{{ old('email', $user->email) }}" required>
+            <label class="form-label">Username</label>
+            <div class="input-group">
+              <input type="text" name="email" class="form-control @error('email') is-invalid @enderror"
+                value="{{ old('email', $emailUsername) }}" required autocomplete="username" placeholder="john.doe">
+              <span class="input-group-text">@stmscaselog.com</span>
+            </div>
             @error('email')
               <div class="invalid-feedback">{{ $message }}</div>
             @enderror

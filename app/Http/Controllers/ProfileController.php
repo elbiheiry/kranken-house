@@ -12,10 +12,16 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+  private const EMAIL_DOMAIN = 'stmscaselog.com';
+
   public function edit(Request $request): View
   {
+    /** @var User $user */
+    $user = $request->user()->loadMissing('residentProfile');
+
     return view('profile.edit', [
-      'user' => $request->user()->loadMissing('residentProfile'),
+      'user' => $user,
+      'emailUsername' => $this->extractEmailLocalPart($user->email),
     ]);
   }
 
@@ -26,14 +32,21 @@ class ProfileController extends Controller
 
     $validated = $request->validate([
       'name' => ['required', 'string', 'max:255'],
-      'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+      'email' => ['required', 'string', 'max:255'],
       'password' => ['nullable', 'string', 'min:8'],
       'training_year' => ['nullable', 'integer', 'min:1', 'max:6'],
     ]);
 
+    $email = $this->normalizeEmailInput($validated['email']);
+
+    validator(
+      ['email' => $email],
+      ['email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)]]
+    )->validate();
+
     $payload = [
       'name' => $validated['name'],
-      'email' => $validated['email'],
+      'email' => $email,
     ];
 
     if (! empty($validated['password'])) {
@@ -50,5 +63,18 @@ class ProfileController extends Controller
     }
 
     return redirect()->route('profile.edit')->with('status', 'Profile updated successfully.');
+  }
+
+  private function normalizeEmailInput(string $value): string
+  {
+    $normalized = strtolower(trim($value));
+    $localPart = trim(strtok($normalized, '@') ?: '');
+
+    return $localPart . '@' . self::EMAIL_DOMAIN;
+  }
+
+  private function extractEmailLocalPart(string $email): string
+  {
+    return trim(strtok(strtolower($email), '@') ?: $email);
   }
 }

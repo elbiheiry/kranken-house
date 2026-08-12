@@ -37,13 +37,22 @@ class CaseLogController extends Controller
   {
     $operationTypes = OperationTypeOption::query()->orderBy('id', 'asc')->get();
     $operationRoles = OperationRoleOption::query()
-      ->whereIn('code', self::RESIDENT_CREATE_ROLE_CODES)
+      ->where(function ($query) {
+        $query->where('code', 'assistant')
+          ->orWhere('code', 'primary');
+      })
       ->orderBy('id', 'asc')
       ->get();
 
     return view('resident.case-log-create', [
       'procedures' => Procedure::query()->orderBy('name', 'asc')->get(),
-      'supervisors' => User::query()->where('role', 'supervisor')->orderBy('name', 'asc')->get(),
+      'supervisors' => User::query()
+        ->where(function ($query) {
+          $query->where('role', 'supervisor')
+            ->orWhere('role', 'director');
+        })
+        ->orderBy('name', 'asc')
+        ->get(),
       'operationTypes' => $operationTypes,
       'operationRoles' => $operationRoles,
     ]);
@@ -54,7 +63,10 @@ class CaseLogController extends Controller
     $resident = Auth::user()->residentProfile;
     $operationTypeCodes = OperationTypeOption::query()->pluck('code')->all();
     $operationRoleCodes = OperationRoleOption::query()
-      ->whereIn('code', self::RESIDENT_CREATE_ROLE_CODES)
+      ->where(function ($query) {
+        $query->where('code', 'assistant')
+          ->orWhere('code', 'primary');
+      })
       ->pluck('code')
       ->all();
 
@@ -65,7 +77,10 @@ class CaseLogController extends Controller
       'difficulty_level' => ['required', 'integer', 'min:1', 'max:5'],
       'role'            => ['required', Rule::in($operationRoleCodes)],
       'operation_date'  => ['required', 'date', 'before_or_equal:today'],
-      'supervisor_id'   => ['nullable', Rule::exists('users', 'id')->where('role', 'supervisor')],
+      'supervisor_id'   => ['nullable', Rule::exists('users', 'id')->where(function ($query) {
+        $query->where('role', 'supervisor')
+          ->orWhere('role', 'director');
+      })],
       'is_external'     => ['sometimes', 'boolean'],
       'note'            => ['nullable', 'string', 'max:1000'],
     ]);
@@ -76,7 +91,9 @@ class CaseLogController extends Controller
       'is_external' => (bool) ($validated['is_external'] ?? false),
     ]);
 
-    $assignedSupervisorId = $validated['supervisor_id'] ?? User::query()->where('role', 'supervisor')->value('id');
+    $assignedSupervisorId = $validated['supervisor_id']
+      ?? User::query()->where('role', 'supervisor')->value('id')
+      ?? User::query()->where('role', 'director')->value('id');
 
     CaseApproval::create([
       'case_log_id' => $log->id,

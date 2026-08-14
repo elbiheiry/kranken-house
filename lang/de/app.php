@@ -94,6 +94,7 @@ return [
   'col_date'            => 'Datum',
   'col_case_code'       => 'Fallcode',
   'col_role'            => 'Rolle',
+  'col_details'         => 'Details',
   'col_feedback'        => 'Rückmeldung',
   'col_resident'        => 'Assistenzarzt',
   'col_action'          => 'Aktion',
@@ -135,12 +136,15 @@ return [
   'external_case'       => 'Externer Fall',
   'external_case_hint'  => 'Aktivieren Sie dies, wenn die Operation außerhalb Ihrer Heimklinik durchgeführt wurde.',
   'external_case_short' => 'Extern',
+  'yes'                 => 'Ja',
+  'no'                  => 'Nein',
   'note'                => 'Anmerkung',
   'submit_for_approval' => 'Zur Genehmigung einreichen',
   'new_log'             => '+ Neuer Eintrag',
 
   // Approvals
   'pending_case_approvals' => 'Ausstehende Fallgenehmigungen',
+  'view_details'        => 'Details anzeigen',
   'approve'             => 'Genehmigen',
   'reject'              => 'Ablehnen',
   'reject_case_log'     => 'Fall ablehnen',

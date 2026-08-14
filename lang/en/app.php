@@ -94,6 +94,7 @@ return [
   'col_date'            => 'Date',
   'col_case_code'       => 'Case Code',
   'col_role'            => 'Role',
+  'col_details'         => 'Details',
   'col_feedback'        => 'Feedback',
   'col_resident'        => 'Resident',
   'col_action'          => 'Action',
@@ -135,12 +136,15 @@ return [
   'external_case'       => 'External case',
   'external_case_hint'  => 'Check this when the operation was performed outside your home institution.',
   'external_case_short' => 'External',
+  'yes'                 => 'Yes',
+  'no'                  => 'No',
   'note'                => 'Note',
   'submit_for_approval' => 'Submit For Approval',
   'new_log'             => '+ New Log',
 
   // Approvals
   'pending_case_approvals' => 'Pending Case Approvals',
+  'view_details'        => 'View details',
   'approve'             => 'Approve',
   'reject'              => 'Reject',
   'reject_case_log'     => 'Reject Case Log',

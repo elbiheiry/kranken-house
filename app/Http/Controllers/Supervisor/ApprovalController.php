@@ -28,6 +28,7 @@ class ApprovalController extends Controller
     $approvalsQuery = CaseApproval::query()
       ->with(['caseLog.resident.user', 'caseLog.procedure'])
       ->where('supervisor_id', Auth::id())
+      ->whereHas('caseLog', fn($query) => $query->where('supervisor_id', Auth::id()))
       ->where('status', 'pending');
 
     if ($caseScope === 'external') {
@@ -53,29 +54,26 @@ class ApprovalController extends Controller
         })
         ->orderBy('id')
         ->get(),
-      'operationRoles' => OperationRoleOption::query()->orderBy('id', 'asc')->get(),
+      'operationRoles' => OperationRoleOption::query()
+        ->whereIn('code', ['assistant', 'primary'])
+        ->orderBy('id', 'asc')
+        ->get(),
       'procedures' => Procedure::query()->orderBy('name', 'asc')->get(),
     ]);
   }
 
   public function update(Request $request, CaseApproval $approval, NotificationService $notificationService): RedirectResponse
   {
-    abort_unless($approval->supervisor_id === Auth::id(), 403);
-
-    $allowedStatuses = ApprovalStatusOption::query()
-      ->where(function ($query) {
-        $query->where('code', 'approved')
-          ->orWhere('code', 'rejected');
-      })
-      ->pluck('code')
-      ->all();
-
-    $allowedRoles = OperationRoleOption::query()->pluck('code')->all();
+    abort_unless(
+      $approval->supervisor_id === Auth::id()
+        && $approval->caseLog()->where('supervisor_id', Auth::id())->exists(),
+      403
+    );
 
     $validated = $request->validate([
-      'status' => ['required', Rule::in($allowedStatuses)],
+      'status' => ['required', Rule::in(['approved', 'rejected'])],
       'feedback' => ['nullable', 'string', 'max:1000'],
-      'approved_role' => ['nullable', Rule::in($allowedRoles)],
+      'approved_role' => ['nullable', Rule::in(['assistant', 'primary'])],
       'approved_procedure_id' => ['nullable', 'exists:procedures,id'],
     ]);
 

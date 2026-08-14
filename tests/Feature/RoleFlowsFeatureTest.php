@@ -120,7 +120,7 @@ class RoleFlowsFeatureTest extends TestCase
     $this->assertSame('Appendectomy', $row['recent_cases'][0]['procedure_name']);
   }
 
-  public function test_supervisor_approvals_page_contains_rejection_modal_with_context_fields(): void
+  public function test_supervisor_approvals_page_contains_case_details_and_decision_actions(): void
   {
     $this->seedLookupOptions();
 
@@ -164,9 +164,15 @@ class RoleFlowsFeatureTest extends TestCase
     $response = $this->get(route('supervisor.approvals.index'));
 
     $response->assertOk();
-    $response->assertSee('id="supervisorRejectModal"', false);
     $response->assertSee('data-current-role="primary"', false);
     $response->assertSee('data-current-procedure="Hernia Repair"', false);
+    $response->assertSee(__('app.col_details'));
+    $response->assertSee(__('app.view_details'));
+    $response->assertSee(__('app.approve'));
+    $response->assertSee(__('app.reject'));
+    $response->assertSee(__('app.operation_type'));
+    $response->assertSee(__('app.difficulty_level'));
+    $response->assertSee('name="status" value="approved"', false);
     $response->assertSee('name="status" value="rejected"', false);
   }
 

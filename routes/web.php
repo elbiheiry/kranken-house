@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function () {
   Route::prefix('supervisor')->name('supervisor.')->middleware('role:supervisor')->group(function () {
     Route::get('/dashboard', [SupervisorDashboardController::class, 'index'])->name('dashboard');
     Route::get('/approvals', [ApprovalController::class, 'index'])->name('approvals.index');
+    Route::post('/approvals/{approval}', [ApprovalController::class, 'update'])->name('approvals.update.post');
     Route::patch('/approvals/{approval}', [ApprovalController::class, 'update'])->name('approvals.update');
   });
 

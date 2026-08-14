@@ -22,6 +22,7 @@
             <th>{{ __('app.col_procedure') }}</th>
             <th>{{ __('app.col_date') }}</th>
             <th>{{ __('app.col_role') }}</th>
+            <th>{{ __('app.col_details') }}</th>
             <th>{{ __('app.col_action') }}</th>
           </tr>
         </thead>
@@ -39,25 +40,32 @@
               <td>{{ $approval->caseLog->operation_date?->format('Y-m-d') }}</td>
               <td>{{ str_replace('_', ' ', $approval->caseLog->role) }}</td>
               <td>
-                <form method="post" action="{{ route('supervisor.approvals.update', $approval) }}"
-                  class="row g-2 js-approval-form" data-case-code="{{ $approval->caseLog->case_code }}"
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse"
+                  data-bs-target="#caseDetails{{ $approval->id }}" aria-expanded="false">
+                  {{ __('app.view_details') }}
+                </button>
+                <div class="collapse mt-2" id="caseDetails{{ $approval->id }}">
+                  <dl class="row mb-0 small">
+                    <dt class="col-sm-5">{{ __('app.operation_type') }}</dt>
+                    <dd class="col-sm-7">{{ ucfirst($approval->caseLog->operation_type) }}</dd>
+                    <dt class="col-sm-5">{{ __('app.difficulty_level') }}</dt>
+                    <dd class="col-sm-7">{{ $approval->caseLog->difficulty_level }}</dd>
+                    <dt class="col-sm-5">{{ __('app.external_case') }}</dt>
+                    <dd class="col-sm-7">{{ $approval->caseLog->is_external ? __('app.yes') : __('app.no') }}</dd>
+                    <dt class="col-sm-5">{{ __('app.note') }}</dt>
+                    <dd class="col-sm-7 text-wrap">{{ $approval->caseLog->note ?: '-' }}</dd>
+                  </dl>
+                </div>
+              </td>
+              <td>
+                <form method="post" action="{{ route('supervisor.approvals.update.post', $approval) }}"
+                  class="d-flex flex-wrap gap-2 js-approval-form" data-case-code="{{ $approval->caseLog->case_code }}"
                   data-resident-name="{{ $approval->caseLog->resident->user->name }}"
                   data-current-role="{{ str_replace('_', ' ', $approval->caseLog->role) }}"
                   data-current-procedure="{{ $approval->caseLog->procedure->name }}">
                   @csrf
-                  @method('patch')
-                  <div class="col-md-4">
-                    <select class="form-select form-select-sm js-status-select" name="status" required>
-                      @foreach ($decisionStatuses as $status)
-                        <option value="{{ $status->code }}">{{ $status->label }}</option>
-                      @endforeach
-                    </select>
-                  </div>
-                  <div class="col-md-5">
-                    <input class="form-control form-control-sm js-feedback-input" name="feedback"
-                      placeholder="{{ __('app.feedback_optional') }}">
-                  </div>
-                  <div class="col-md-4">
+                  <input type="hidden" name="feedback" value="">
+                  <div class="w-100">
                     <select class="form-select form-select-sm js-approved-role" name="approved_role">
                       <option value="">Approved role (optional)</option>
                       @foreach ($operationRoles as $role)
@@ -66,7 +74,7 @@
                       @endforeach
                     </select>
                   </div>
-                  <div class="col-md-4">
+                  <div class="w-100">
                     <select class="form-select form-select-sm js-approved-procedure" name="approved_procedure_id">
                       <option value="">Approved procedure (optional)</option>
                       @foreach ($procedures as $procedure)
@@ -75,15 +83,18 @@
                       @endforeach
                     </select>
                   </div>
-                  <div class="col-md-3">
-                    <button type="submit" class="btn btn-sm btn-primary w-100">{{ __('app.save') }}</button>
+                  <div class="d-flex gap-2">
+                    <button type="submit" name="status" value="approved"
+                      class="btn btn-sm btn-success">{{ __('app.approve') }}</button>
+                    <button type="submit" name="status" value="rejected"
+                      class="btn btn-sm btn-danger">{{ __('app.reject') }}</button>
                   </div>
                 </form>
               </td>
             </tr>
           @empty
             <tr>
-              <td colspan="6" class="text-center text-muted">{{ __('app.no_pending_approvals') }}</td>
+              <td colspan="7" class="text-center text-muted">{{ __('app.no_pending_approvals') }}</td>
             </tr>
           @endforelse
         </tbody>
@@ -92,111 +103,4 @@
     <div class="card-body">{{ $approvals->links() }}</div>
   </div>
 
-  <div class="modal fade" id="supervisorRejectModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form method="post" id="supervisorRejectForm">
-          @csrf
-          @method('patch')
-          <input type="hidden" name="status" value="rejected">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ __('app.review_rejection_details') }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-2"><strong>{{ __('app.col_case_code') }}:</strong> <span id="rejectModalCaseCode">-</span>
-            </div>
-            <div class="mb-2"><strong>{{ __('app.col_resident') }}:</strong> <span
-                id="rejectModalResidentName">-</span>
-            </div>
-            <div class="mb-2"><strong>{{ __('app.current_role') }}:</strong> <span id="rejectModalCurrentRole">-</span>
-            </div>
-            <div class="mb-3"><strong>{{ __('app.current_procedure') }}:</strong> <span
-                id="rejectModalCurrentProcedure">-</span></div>
-
-            <div class="mb-3">
-              <label for="rejectApprovedRole" class="form-label">{{ __('app.col_role') }}</label>
-              <select class="form-select" id="rejectApprovedRole" name="approved_role">
-                <option value="">Approved role (optional)</option>
-                @foreach ($operationRoles as $role)
-                  <option value="{{ $role->code }}">{{ $role->label }}</option>
-                @endforeach
-              </select>
-            </div>
-
-            <div class="mb-3">
-              <label for="rejectApprovedProcedure" class="form-label">{{ __('app.col_procedure') }}</label>
-              <select class="form-select" id="rejectApprovedProcedure" name="approved_procedure_id">
-                <option value="">Approved procedure (optional)</option>
-                @foreach ($procedures as $procedure)
-                  <option value="{{ $procedure->id }}">{{ $procedure->name }}</option>
-                @endforeach
-              </select>
-            </div>
-
-            <div>
-              <label for="rejectFeedback" class="form-label">{{ __('app.feedback_optional') }}</label>
-              <textarea class="form-control" id="rejectFeedback" name="feedback" rows="3"
-                placeholder="{{ __('app.feedback_optional') }}"></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary"
-              data-bs-dismiss="modal">{{ __('app.close') }}</button>
-            <button type="submit" class="btn btn-danger">{{ __('app.reject_case_log') }}</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    (function() {
-      var rejectModalEl = document.getElementById('supervisorRejectModal');
-      var rejectForm = document.getElementById('supervisorRejectForm');
-
-      if (!rejectModalEl || !rejectForm) {
-        return;
-      }
-
-      var rejectModal = typeof bootstrap !== 'undefined' ? bootstrap.Modal.getOrCreateInstance(rejectModalEl) : null;
-
-      document.querySelectorAll('.js-approval-form').forEach(function(form) {
-        form.addEventListener('submit', function(event) {
-          var statusSelect = form.querySelector('.js-status-select');
-          var approvedRole = form.querySelector('.js-approved-role');
-          var approvedProcedure = form.querySelector('.js-approved-procedure');
-          var feedback = form.querySelector('.js-feedback-input');
-          var isRejected = statusSelect && statusSelect.value === 'rejected';
-
-          if (!isRejected) {
-            return;
-          }
-
-          event.preventDefault();
-
-          rejectForm.setAttribute('action', form.getAttribute('action'));
-          document.getElementById('rejectModalCaseCode').textContent = form.getAttribute('data-case-code') ||
-            '-';
-          document.getElementById('rejectModalResidentName').textContent = form.getAttribute(
-            'data-resident-name') || '-';
-          document.getElementById('rejectModalCurrentRole').textContent = form.getAttribute(
-            'data-current-role') || '-';
-          document.getElementById('rejectModalCurrentProcedure').textContent = form.getAttribute(
-            'data-current-procedure') || '-';
-
-          document.getElementById('rejectApprovedRole').value = approvedRole ? approvedRole.value : '';
-          document.getElementById('rejectApprovedProcedure').value = approvedProcedure ? approvedProcedure
-            .value : '';
-          document.getElementById('rejectFeedback').value = feedback ? feedback.value : '';
-
-          if (rejectModal) {
-            rejectModal.show();
-          } else {
-            rejectForm.submit();
-          }
-        });
-      });
-    })();
-  </script>
 @endsection
